@@ -94,8 +94,6 @@ impl Platform for ArtyE21 {
 
 #[no_mangle]
 pub unsafe fn reset_handler() {
-    rv32i::init_memory();
-
     let chip = static_init!(arty_e21::chip::ArtyExx, arty_e21::chip::ArtyExx::new());
     let process_mgmt_cap = create_capability!(capabilities::ProcessManagementCapability);
     let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
