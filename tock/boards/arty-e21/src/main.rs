@@ -97,14 +97,19 @@ pub unsafe fn reset_handler() {
     rv32i::init_memory();
 
     let chip = static_init!(arty_e21::chip::ArtyExx, arty_e21::chip::ArtyExx::new());
+/*
     chip.initialize();
+*/
 
     let process_mgmt_cap = create_capability!(capabilities::ProcessManagementCapability);
+/*
     let main_loop_cap = create_capability!(capabilities::MainLoopCapability);
     let memory_allocation_cap = create_capability!(capabilities::MemoryAllocationCapability);
 
+*/
     let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
 
+/*
     kernel::debug::assign_gpios(
         Some(&arty_e21::gpio::PORT[0]), // Red
         Some(&arty_e21::gpio::PORT[1]),
@@ -243,6 +248,7 @@ pub unsafe fn reset_handler() {
     kernel::debug::set_debug_writer_wrapper(debug_wrapper);
 
     debug!("Initialization complete. Entering main loop.");
+*/
 
     extern "C" {
         static _sapps: u8;
@@ -258,5 +264,7 @@ pub unsafe fn reset_handler() {
         &process_mgmt_cap,
     );
 
+/*
     board_kernel.kernel_loop(&artye21, chip, None, &main_loop_cap);
+*/
 }
