@@ -6,12 +6,6 @@
 #![feature(associated_type_defaults)]
 #![warn(unreachable_pub)]
 #![no_std]
-#[prelude_import]
-use core::prelude::v1::*;
-#[macro_use]
-extern crate core;
-#[macro_use]
-extern crate compiler_builtins;
 
 pub mod capabilities {
 
@@ -165,19 +159,16 @@ pub mod common {
             fn call(&self, handle: DeferredCallHandle);
         }
         pub struct DeferredCallHandle(usize);
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for DeferredCallHandle { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for DeferredCallHandle {
             #[inline]
             fn clone(&self) -> DeferredCallHandle {
                 { let _: ::core::clone::AssertParamIsClone<usize>; *self }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for DeferredCallHandle {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -277,19 +268,16 @@ pub mod common {
             num
         }
         pub struct PowerOfTwo(u32);
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for PowerOfTwo { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for PowerOfTwo {
             #[inline]
             fn clone(&self) -> PowerOfTwo {
                 { let _: ::core::clone::AssertParamIsClone<u32>; *self }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for PowerOfTwo {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -303,8 +291,7 @@ pub mod common {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for PowerOfTwo {
             #[inline]
             fn eq(&self, other: &PowerOfTwo) -> bool {
@@ -327,8 +314,7 @@ pub mod common {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialOrd for PowerOfTwo {
             #[inline]
             fn partial_cmp(&self, other: &PowerOfTwo)
@@ -401,8 +387,7 @@ pub mod common {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::Eq for PowerOfTwo {
             #[inline]
             #[doc(hidden)]
@@ -410,8 +395,7 @@ pub mod common {
                 { let _: ::core::cmp::AssertParamIsEq<u32>; }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::Ord for PowerOfTwo {
             #[inline]
             fn cmp(&self, other: &PowerOfTwo) -> ::core::cmp::Ordering {
@@ -605,8 +589,7 @@ pub mod common {
         pub struct StaticRef<T> {
             ptr: *const T,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl <T: ::core::fmt::Debug> ::core::fmt::Debug for StaticRef<T> {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1121,8 +1104,7 @@ pub mod hil {
             AdvertisingChannel38 = 26,
             AdvertisingChannel39 = 80,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for RadioChannel {
             #[inline]
             fn eq(&self, other: &RadioChannel) -> bool {
@@ -1141,8 +1123,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for RadioChannel {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1350,11 +1331,9 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for RadioChannel { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for RadioChannel {
             #[inline]
             fn clone(&self) -> RadioChannel { { *self } }
@@ -1420,11 +1399,9 @@ pub mod hil {
 
             Sam4L32C,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for CrcAlg { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for CrcAlg {
             #[inline]
             fn clone(&self) -> CrcAlg { { *self } }
@@ -1454,8 +1431,7 @@ pub mod hil {
             HighLevel,
             LowLevel,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for InterruptMode {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1502,8 +1478,7 @@ pub mod hil {
 
             Done,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Continue {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1519,15 +1494,13 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::Eq for Continue {
             #[inline]
             #[doc(hidden)]
             fn assert_receiver_is_total_eq(&self) -> () { { } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Continue {
             #[inline]
             fn eq(&self, other: &Continue) -> bool {
@@ -1580,17 +1553,14 @@ pub mod hil {
 
             FlashError,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Error { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Error {
             #[inline]
             fn clone(&self) -> Error { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Error {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1608,15 +1578,13 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::Eq for Error {
             #[inline]
             #[doc(hidden)]
             fn assert_receiver_is_total_eq(&self) -> () { { } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Error {
             #[inline]
             fn eq(&self, other: &Error) -> bool {
@@ -1663,8 +1631,7 @@ pub mod hil {
         use crate::ReturnCode;
         use core::cell::Cell;
         pub enum FloatingState { PullUp, PullDown, PullNone, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for FloatingState {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1687,8 +1654,7 @@ pub mod hil {
             }
         }
         pub enum InterruptEdge { RisingEdge, FallingEdge, EitherEdge, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for InterruptEdge {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1725,8 +1691,7 @@ pub mod hil {
 
             Other,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Configuration {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1948,17 +1913,14 @@ pub mod hil {
 
             CommandComplete,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Error { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Error {
             #[inline]
             fn clone(&self) -> Error { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Error {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -1991,15 +1953,13 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::Eq for Error {
             #[inline]
             #[doc(hidden)]
             fn assert_receiver_is_total_eq(&self) -> () { { } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Error {
             #[inline]
             fn eq(&self, other: &Error) -> bool {
@@ -2038,17 +1998,14 @@ pub mod hil {
             }
         }
         pub enum SlaveTransmissionType { Write, Read, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for SlaveTransmissionType { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for SlaveTransmissionType {
             #[inline]
             fn clone(&self) -> SlaveTransmissionType { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for SlaveTransmissionType {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2264,8 +2221,7 @@ pub mod hil {
 
             Done,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Continue {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2281,15 +2237,13 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::Eq for Continue {
             #[inline]
             #[doc(hidden)]
             fn assert_receiver_is_total_eq(&self) -> () { { } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Continue {
             #[inline]
             fn eq(&self, other: &Continue) -> bool {
@@ -2373,17 +2327,14 @@ pub mod hil {
         use crate::returncode::ReturnCode;
         use core::option::Option;
         pub enum DataOrder { MSBFirst, LSBFirst, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for DataOrder { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for DataOrder {
             #[inline]
             fn clone(&self) -> DataOrder { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for DataOrder {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2402,17 +2353,14 @@ pub mod hil {
             }
         }
         pub enum ClockPolarity { IdleLow, IdleHigh, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for ClockPolarity { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for ClockPolarity {
             #[inline]
             fn clone(&self) -> ClockPolarity { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for ClockPolarity {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2430,8 +2378,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for ClockPolarity {
             #[inline]
             fn eq(&self, other: &ClockPolarity) -> bool {
@@ -2451,17 +2398,14 @@ pub mod hil {
             }
         }
         pub enum ClockPhase { SampleLeading, SampleTrailing, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for ClockPhase { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for ClockPhase {
             #[inline]
             fn clone(&self) -> ClockPhase { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for ClockPhase {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2479,8 +2423,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for ClockPhase {
             #[inline]
             fn eq(&self, other: &ClockPhase) -> bool {
@@ -2658,8 +2601,7 @@ pub mod hil {
             -> u32;
         }
         pub struct Freq16MHz;
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Freq16MHz {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2676,8 +2618,7 @@ pub mod hil {
             fn frequency() -> u32 { 16000000 }
         }
         pub struct Freq32KHz;
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Freq32KHz {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2694,8 +2635,7 @@ pub mod hil {
             fn frequency() -> u32 { 32768 }
         }
         pub struct Freq16KHz;
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Freq16KHz {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2712,8 +2652,7 @@ pub mod hil {
             fn frequency() -> u32 { 16000 }
         }
         pub struct Freq1KHz;
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Freq1KHz {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2762,17 +2701,14 @@ pub mod hil {
     pub mod uart {
         use crate::returncode::ReturnCode;
         pub enum StopBits { One = 1, Two = 2, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for StopBits { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for StopBits {
             #[inline]
             fn clone(&self) -> StopBits { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for StopBits {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2788,8 +2724,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for StopBits {
             #[inline]
             fn eq(&self, other: &StopBits) -> bool {
@@ -2809,17 +2744,14 @@ pub mod hil {
             }
         }
         pub enum Parity { None = 0, Odd = 1, Even = 2, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Parity { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Parity {
             #[inline]
             fn clone(&self) -> Parity { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Parity {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2839,8 +2771,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Parity {
             #[inline]
             fn eq(&self, other: &Parity) -> bool {
@@ -2860,17 +2791,14 @@ pub mod hil {
             }
         }
         pub enum Width { Six = 6, Seven = 7, Eight = 8, }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Width { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Width {
             #[inline]
             fn clone(&self) -> Width { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Width {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2890,8 +2818,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Width {
             #[inline]
             fn eq(&self, other: &Width) -> bool {
@@ -2917,11 +2844,9 @@ pub mod hil {
             pub stop_bits: StopBits,
             pub hw_flow_control: bool,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Parameters { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Parameters {
             #[inline]
             fn clone(&self) -> Parameters {
@@ -2935,8 +2860,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Parameters {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -2985,17 +2909,14 @@ pub mod hil {
 
             Aborted,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Error { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Error {
             #[inline]
             fn clone(&self) -> Error { { *self } }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for Error {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -3037,8 +2958,7 @@ pub mod hil {
                 }
             }
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::cmp::PartialEq for Error {
             #[inline]
             fn eq(&self, other: &Error) -> bool {
@@ -3154,8 +3074,7 @@ pub mod hil {
             ErrInvalidStringIndex,
             ErrGeneric,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::fmt::Debug for CtrlSetupResult {
             fn fmt(&self, f: &mut ::core::fmt::Formatter)
              -> ::core::fmt::Result {
@@ -3597,11 +3516,9 @@ pub mod syscall {
             arg0: usize,
         },
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for Syscall { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for Syscall {
         #[inline]
         fn clone(&self) -> Syscall {
@@ -3624,8 +3541,7 @@ pub mod syscall {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for Syscall {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -3699,8 +3615,7 @@ pub mod syscall {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for Syscall {
         #[inline]
         fn eq(&self, other: &Syscall) -> bool {
@@ -3837,8 +3752,7 @@ pub mod syscall {
 
         Interrupted,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for ContextSwitchReason {
         #[inline]
         fn eq(&self, other: &ContextSwitchReason) -> bool {
@@ -3940,8 +3854,7 @@ mod callback {
         crate kernel: &'static Kernel,
         idx: usize,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for AppId {
         #[inline]
         fn clone(&self) -> AppId {
@@ -3952,8 +3865,7 @@ mod callback {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for AppId { }
     impl PartialEq for AppId {
         fn eq(&self, other: &AppId) -> bool { self.idx == other.idx }
@@ -3992,11 +3904,9 @@ mod callback {
         pub driver_num: usize,
         pub subscribe_num: usize,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for CallbackId { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for CallbackId {
         #[inline]
         fn clone(&self) -> CallbackId {
@@ -4007,8 +3917,7 @@ mod callback {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for CallbackId {
         #[inline]
         fn eq(&self, other: &CallbackId) -> bool {
@@ -4039,8 +3948,7 @@ mod callback {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for CallbackId {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -4066,8 +3974,7 @@ mod callback {
         appdata: usize,
         fn_ptr: NonNull<*mut ()>,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for Callback {
         #[inline]
         fn clone(&self) -> Callback {
@@ -4080,8 +3987,7 @@ mod callback {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for Callback { }
     impl Callback {
         crate fn new(app_id: AppId, callback_id: CallbackId, appdata: usize,
@@ -4361,8 +4267,7 @@ mod mem {
     use core::slice;
     use crate::callback::AppId;
     pub struct Private;
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for Private {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -4374,8 +4279,7 @@ mod mem {
         }
     }
     pub struct Shared;
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for Shared {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -4552,11 +4456,9 @@ mod platform {
             ReadOnly,
             ExecuteOnly,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Permissions { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Permissions {
             #[inline]
             fn clone(&self) -> Permissions { { *self } }
@@ -4565,11 +4467,9 @@ mod platform {
             start_address: *const u8,
             size: usize,
         }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::marker::Copy for Region { }
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::clone::Clone for Region {
             #[inline]
             fn clone(&self) -> Region {
@@ -4588,8 +4488,7 @@ mod platform {
             pub fn size(&self) -> usize { self.size }
         }
         pub struct MpuConfig;
-        #[automatically_derived]
-        #[allow(unused_qualifications)]
+                #[allow(unused_qualifications)]
         impl ::core::default::Default for MpuConfig {
             #[inline]
             fn default() -> MpuConfig { MpuConfig{} }
@@ -4831,17 +4730,14 @@ mod process {
         AddressOutOfBounds,
         KernelError,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for Error { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for Error {
         #[inline]
         fn clone(&self) -> Error { { *self } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for Error {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -4867,15 +4763,13 @@ mod process {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::Eq for Error {
         #[inline]
         #[doc(hidden)]
         fn assert_receiver_is_total_eq(&self) -> () { { } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for Error {
         #[inline]
         fn eq(&self, other: &Error) -> bool {
@@ -4918,17 +4812,14 @@ mod process {
 
         Unstarted,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for State { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for State {
         #[inline]
         fn clone(&self) -> State { { *self } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for State {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -4966,15 +4857,13 @@ mod process {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::Eq for State {
         #[inline]
         #[doc(hidden)]
         fn assert_receiver_is_total_eq(&self) -> () { { } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for State {
         #[inline]
         fn eq(&self, other: &State) -> bool {
@@ -4999,17 +4888,14 @@ mod process {
 
         Stop,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for FaultResponse { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for FaultResponse {
         #[inline]
         fn clone(&self) -> FaultResponse { { *self } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for FaultResponse {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -5028,15 +4914,13 @@ mod process {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::Eq for FaultResponse {
         #[inline]
         #[doc(hidden)]
         fn assert_receiver_is_total_eq(&self) -> () { { } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for FaultResponse {
         #[inline]
         fn eq(&self, other: &FaultResponse) -> bool {
@@ -5054,17 +4938,14 @@ mod process {
         }
     }
     pub enum IPCType { Service, Client, }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for IPCType { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for IPCType {
         #[inline]
         fn clone(&self) -> IPCType { { *self } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for IPCType {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -5080,11 +4961,9 @@ mod process {
         }
     }
     pub enum Task { FunctionCall(FunctionCall), IPC((AppId, IPCType)), }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for Task { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for Task {
         #[inline]
         fn clone(&self) -> Task {
@@ -5096,19 +4975,16 @@ mod process {
         }
     }
     pub enum FunctionCallSource { Kernel, Driver(CallbackId), }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for FunctionCallSource { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for FunctionCallSource {
         #[inline]
         fn clone(&self) -> FunctionCallSource {
             { let _: ::core::clone::AssertParamIsClone<CallbackId>; *self }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for FunctionCallSource {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -5132,11 +5008,9 @@ mod process {
         pub argument3: usize,
         pub pc: usize,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for FunctionCall { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for FunctionCall {
         #[inline]
         fn clone(&self) -> FunctionCall {
@@ -5151,8 +5025,7 @@ mod process {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for FunctionCall {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -6482,19 +6355,16 @@ mod returncode {
 
         ENOACK,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for ReturnCode {
         #[inline]
         fn clone(&self) -> ReturnCode {
             { let _: ::core::clone::AssertParamIsClone<usize>; *self }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for ReturnCode { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for ReturnCode {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
@@ -6564,8 +6434,7 @@ mod returncode {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::cmp::PartialEq for ReturnCode {
         #[inline]
         fn eq(&self, other: &ReturnCode) -> bool {
@@ -6965,9 +6834,6 @@ mod sched {
 }
 mod tbfheader {
     use core::{mem, slice, str};
-    macro_rules! align4 {
-        ($ e : expr) => { ($ e) + ((4 - (($ e) % 4)) % 4) } ;
-    }
     #[repr(C)]
     crate struct TbfHeaderV2Base {
         version: u16,
@@ -6976,8 +6842,7 @@ mod tbfheader {
         flags: u32,
         checksum: u32,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for TbfHeaderV2Base {
         #[inline]
         fn clone(&self) -> TbfHeaderV2Base {
@@ -6991,11 +6856,9 @@ mod tbfheader {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for TbfHeaderV2Base { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for TbfHeaderV2Base {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -7033,19 +6896,16 @@ mod tbfheader {
         TbfHeaderPackageName = 3,
         Unused = 5,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     #[allow(dead_code)]
     impl ::core::clone::Clone for TbfHeaderTypes {
         #[inline]
         fn clone(&self) -> TbfHeaderTypes { { *self } }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     #[allow(dead_code)]
     impl ::core::marker::Copy for TbfHeaderTypes { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     #[allow(dead_code)]
     impl ::core::fmt::Debug for TbfHeaderTypes {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
@@ -7077,8 +6937,7 @@ mod tbfheader {
         tipe: TbfHeaderTypes,
         length: u16,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for TbfHeaderTlv {
         #[inline]
         fn clone(&self) -> TbfHeaderTlv {
@@ -7089,11 +6948,9 @@ mod tbfheader {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for TbfHeaderTlv { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for TbfHeaderTlv {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -7116,8 +6973,7 @@ mod tbfheader {
         protected_size: u32,
         minimum_ram_size: u32,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for TbfHeaderV2Main {
         #[inline]
         fn clone(&self) -> TbfHeaderV2Main {
@@ -7129,11 +6985,9 @@ mod tbfheader {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for TbfHeaderV2Main { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for TbfHeaderV2Main {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -7162,8 +7016,7 @@ mod tbfheader {
         writeable_flash_region_offset: u32,
         writeable_flash_region_size: u32,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for TbfHeaderV2WriteableFlashRegion {
         #[inline]
         fn clone(&self) -> TbfHeaderV2WriteableFlashRegion {
@@ -7174,11 +7027,9 @@ mod tbfheader {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for TbfHeaderV2WriteableFlashRegion { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for TbfHeaderV2WriteableFlashRegion {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -7204,8 +7055,7 @@ mod tbfheader {
         package_name: Option<&'static str>,
         writeable_regions: Option<&'static [TbfHeaderV2WriteableFlashRegion]>,
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::clone::Clone for TbfHeaderV2 {
         #[inline]
         fn clone(&self) -> TbfHeaderV2 {
@@ -7222,11 +7072,9 @@ mod tbfheader {
             }
         }
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::marker::Copy for TbfHeaderV2 { }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for TbfHeaderV2 {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match *self {
@@ -7256,8 +7104,7 @@ mod tbfheader {
         TbfHeaderV2(TbfHeaderV2),
         Padding(&'static TbfHeaderV2Base),
     }
-    #[automatically_derived]
-    #[allow(unused_qualifications)]
+        #[allow(unused_qualifications)]
     impl ::core::fmt::Debug for TbfHeader {
         fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
             match (&*self,) {
