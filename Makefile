@@ -1,4 +1,5 @@
 all:
+	wc tock/chips/arty_e21/src/lib.rs
 	wc tock/boards/arty-e21/src/main.rs
 	( cd tock/boards/arty-e21/ && RUSTFLAGS="-C link-arg=-Tlayout.ld" cargo build --target riscv32imac-unknown-none-elf )
 
