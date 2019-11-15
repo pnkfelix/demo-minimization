@@ -13,8 +13,6 @@ extern "C" {
 }
 
 pub struct ArtyExx {
-    _userspace_kernel_boundary: rv32i::syscall::SysCall,
-    _clic: rv32i::clic::Clic,
 }
 
 impl ArtyExx {
