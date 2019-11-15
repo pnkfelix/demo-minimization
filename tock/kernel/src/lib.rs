@@ -2525,7 +2525,7 @@ mod platform {
         type
         MPU: mpu::MPU;
         type
-        UserspaceKernelBoundary: syscall::UserspaceKernelBoundary;
+        UserspaceKernelBoundary;
         type
         SysTick: systick::SysTick;
         fn service_pending_interrupts(&self) { loop  { } }
