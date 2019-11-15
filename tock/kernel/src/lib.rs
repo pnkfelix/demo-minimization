@@ -2809,9 +2809,6 @@ pub struct Process<'a, C: 'static + Chip> {
 
     header: tbfheader::TbfHeader,
 
-    stored_state:
-        Cell<<<C as Chip>::UserspaceKernelBoundary as UserspaceKernelBoundary>::StoredState>,
-
     state: Cell<State>,
 
     fault_response: FaultResponse,
