@@ -31,17 +31,15 @@ pub const UART0: u32 = 16;
 
 pub mod chip {
 use kernel;
-use kernel::debug;
 use rv32i;
-use rv32i::machine_timer;
 
 extern "C" {
     fn _start_trap();
 }
 
 pub struct ArtyExx {
-    userspace_kernel_boundary: rv32i::syscall::SysCall,
-    clic: rv32i::clic::Clic,
+    _userspace_kernel_boundary: rv32i::syscall::SysCall,
+    _clic: rv32i::clic::Clic,
 }
 
 impl ArtyExx {
@@ -75,7 +73,7 @@ impl kernel::Chip for ArtyExx {
 
     fn sleep(&self) { loop { } }
 
-    unsafe fn atomic<F, R>(&self, f: F) -> R
+    unsafe fn atomic<F, R>(&self, _: F) -> R
     where
         F: FnOnce() -> R,
     { loop { } }
@@ -85,7 +83,7 @@ impl kernel::Chip for ArtyExx {
     pub extern "C" fn start_trap_rust() { loop { } }
 
 #[export_name = "_disable_interrupt_trap_handler"]
-    pub extern "C" fn disable_interrupt_trap_handler(mcause: u32) { loop { } }
+    pub extern "C" fn disable_interrupt_trap_handler(_: u32) { loop { } }
 }
 #[cfg(not_now)]
 mod gpio {
