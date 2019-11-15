@@ -7,29 +7,6 @@ use kernel::capabilities;
 use kernel::Platform;
 use kernel::{create_capability, static_init};
 
-#[cfg(not_now)]
-mod timer_test {
-#![allow(dead_code)]
-
-use kernel::hil::time::{self, Alarm};
-
-pub struct TimerTest<'a, A: Alarm<'a>> {
-    alarm: &'a A,
-}
-
-impl<A: Alarm<'a>> TimerTest<'a, A> {
-    pub const fn new(alarm: &'a A) -> TimerTest<'a, A> {
-        TimerTest { alarm: alarm }
-    }
-
-    pub fn start(&self) { loop { } }
-}
-
-impl<A: Alarm<'a>> time::AlarmClient for TimerTest<'a, A> {
-    fn fired(&self) { loop { } }
-}
-}
-
 pub mod io {
 use core::fmt::Write;
 use core::panic::PanicInfo;
