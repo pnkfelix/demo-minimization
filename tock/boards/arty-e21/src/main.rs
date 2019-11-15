@@ -7,15 +7,7 @@ use kernel::Platform;
 use kernel::{create_capability, static_init};
 
 pub mod io {
-use core::fmt::Write;
 use core::panic::PanicInfo;
-use core::str;
-
-struct Writer;
-
-impl Write for Writer {
-    fn write_str(&mut self, _: &str) -> ::core::fmt::Result { loop { } }
-}
 
 #[cfg(not(test))]
 #[no_mangle]
