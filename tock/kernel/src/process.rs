@@ -1,5 +1,3 @@
-//! Support for creating and running userspace applications.
-
 use core::cell::Cell;
 use core::fmt::Write;
 use core::ptr::write_volatile;
@@ -18,16 +16,6 @@ use crate::syscall::{self, Syscall, UserspaceKernelBoundary};
 use crate::tbfheader;
 use core::cmp::max;
 
-/// Helper function to load processes from flash into an array of active
-/// processes. This is the default template for loading processes, but a board
-/// is able to create its own `load_processes()` function and use that instead.
-///
-/// Processes are found in flash starting from the given address and iterating
-/// through Tock Binary Format headers. Processes are given memory out of the
-/// `app_memory` buffer until either the memory is exhausted or the allocated
-/// number of processes are created, with process structures placed in the
-/// provided array. How process faults are handled by the kernel is also
-/// selected.
 pub fn load_processes<C: Chip>(
     kernel: &'static Kernel,
     chip: &'static C,
@@ -53,10 +41,6 @@ pub fn load_processes<C: Chip>(
             );
 
             if process.is_none() {
-                // We did not get a valid process, but we may have gotten a disabled
-                // process or padding. Therefore we want to skip this chunk of flash
-                // and see if there is a valid app there. However, if we cannot
-                // advance the flash pointer, then we are done.
                 if flash_offset == 0 && memory_offset == 0 {
                     break;
                 }
@@ -71,122 +55,59 @@ pub fn load_processes<C: Chip>(
     }
 }
 
-/// This trait is implemented by process structs.
 pub trait ProcessType {
-    /// Returns the process's identifier
     fn appid(&self) -> AppId;
 
-    /// Queue a `Task` for the process. This will be added to a per-process
-    /// buffer and executed by the scheduler. `Task`s are some function the app
-    /// should run, for example a callback or an IPC call.
-    ///
-    /// This function returns `true` if the `Task` was successfully enqueued,
-    /// and `false` otherwise. This is represented as a simple `bool` because
-    /// this is passed to the capsule that tried to schedule the `Task`.
     fn enqueue_task(&self, task: Task) -> bool;
 
-    /// Remove the scheduled operation from the front of the queue and return it
-    /// to be handled by the scheduler.
-    ///
-    /// If there are no `Task`s in the queue for this process this will return
-    /// `None`.
     fn dequeue_task(&self) -> Option<Task>;
 
-    /// Remove all scheduled callbacks for a given callback id from the task
-    /// queue.
     fn remove_pending_callbacks(&self, callback_id: CallbackId);
 
-    /// Returns the current state the process is in. Common states are "running"
-    /// or "yielded".
     fn get_state(&self) -> State;
 
-    /// Move this process from the running state to the yielded state.
     fn set_yielded_state(&self);
 
-    /// Move this process from running or yielded state into the stopped state
     fn stop(&self);
 
-    /// Move this stopped process back into its original state
     fn resume(&self);
 
-    /// Put this process in the fault state. This will trigger the
-    /// `FaultResponse` for this process to occur.
     fn set_fault_state(&self);
 
-    /// Get the name of the process. Used for IPC.
     fn get_process_name(&self) -> &'static str;
 
-    // memop operations
-
-    /// Change the location of the program break and reallocate the MPU region
-    /// covering program memory.
     fn brk(&self, new_break: *const u8) -> Result<*const u8, Error>;
 
-    /// Change the location of the program break, reallocate the MPU region
-    /// covering program memory, and return the previous break address.
     fn sbrk(&self, increment: isize) -> Result<*const u8, Error>;
 
-    /// The start address of allocated RAM for this process.
     fn mem_start(&self) -> *const u8;
 
-    /// The first address after the end of the allocated RAM for this process.
     fn mem_end(&self) -> *const u8;
 
-    /// The start address of the flash region allocated for this process.
     fn flash_start(&self) -> *const u8;
 
-    /// The first address after the end of the flash region allocated for this
-    /// process.
     fn flash_end(&self) -> *const u8;
 
-    /// The lowest address of the grant region for the process.
     fn kernel_memory_break(&self) -> *const u8;
 
-    /// How many writeable flash regions defined in the TBF header for this
-    /// process.
     fn number_writeable_flash_regions(&self) -> usize;
 
-    /// Get the offset from the beginning of flash and the size of the defined
-    /// writeable flash region.
     fn get_writeable_flash_region(&self, region_index: usize) -> (u32, u32);
 
-    /// Debug function to update the kernel on where the stack starts for this
-    /// process. Processes are not required to call this through the memop
-    /// system call, but it aids in debugging the process.
     fn update_stack_start_pointer(&self, stack_pointer: *const u8);
 
-    /// Debug function to update the kernel on where the process heap starts.
-    /// Also optional.
     fn update_heap_start_pointer(&self, heap_pointer: *const u8);
 
-    // additional memop like functions
-
-    /// Creates an `AppSlice` from the given offset and size in process memory.
-    ///
-    /// ## Returns
-    ///
-    /// If the buffer is null (a zero-valued offset), return None, signaling the capsule to delete
-    /// the entry.  If the buffer is within the process's accessible memory, returns an AppSlice
-    /// wrapping that buffer. Otherwise, returns an error `ReturnCode`.
     fn allow(
         &self,
         buf_start_addr: *const u8,
         size: usize,
     ) -> Result<Option<AppSlice<Shared, u8>>, ReturnCode>;
 
-    /// Get the first address of process's flash that isn't protected by the
-    /// kernel. The protected range of flash contains the TBF header and
-    /// potentially other state the kernel is storing on behalf of the process,
-    /// and cannot be edited by the process.
     fn flash_non_protected_start(&self) -> *const u8;
 
-    // mpu
-
-    /// Configure the MPU to use the process's allocated regions.
     fn setup_mpu(&self);
 
-    /// Allocate a new MPU region for the process that is at least `min_region_size`
-    /// bytes and lies within the specified stretch of unallocated memory.
     fn add_mpu_region(
         &self,
         unallocated_memory_start: *const u8,
@@ -194,44 +115,27 @@ pub trait ProcessType {
         min_region_size: usize,
     ) -> Option<mpu::Region>;
 
-    // grants
-
-    /// Create new memory in the grant region, and check that the MPU region
-    /// covering program memory does not extend past the kernel memory break.
     unsafe fn alloc(&self, size: usize, align: usize) -> Option<&mut [u8]>;
 
     unsafe fn free(&self, _: *mut u8);
 
-    /// Get a pointer to the grant pointer for this grant number.
     unsafe fn grant_ptr(&self, grant_num: usize) -> *mut *mut u8;
 
-    // functions for processes that are architecture specific
-
-    /// Set the return value the process should see when it begins executing
-    /// again after the syscall.
     unsafe fn set_syscall_return_value(&self, return_value: isize);
 
-    /// Set the function that is to be executed when the process is resumed.
     unsafe fn set_process_function(&self, callback: FunctionCall);
 
-    /// Context switch to a specific process.
     unsafe fn switch_to(&self) -> Option<syscall::ContextSwitchReason>;
 
     unsafe fn fault_fmt(&self, writer: &mut dyn Write);
     unsafe fn process_detail_fmt(&self, writer: &mut dyn Write);
 
-    // debug
-
-    /// Returns how many syscalls this app has called.
     fn debug_syscall_count(&self) -> usize;
 
-    /// Returns how many callbacks for this process have been dropped.
     fn debug_dropped_callback_count(&self) -> usize;
 
-    /// Returns how many times this process has been restarted.
     fn debug_restart_count(&self) -> usize;
 
-    /// Returns how many times this process has exceeded its timeslice.
     fn debug_timeslice_expiration_count(&self) -> usize;
 
     fn debug_timeslice_expired(&self);
@@ -243,7 +147,6 @@ pub enum Error {
     OutOfMemory,
     AddressOutOfBounds,
     KernelError, // This likely indicates a bug in the kernel and that some
-                 // state is inconsistent in the kernel.
 }
 
 impl From<Error> for ReturnCode {
@@ -257,65 +160,29 @@ impl From<Error> for ReturnCode {
     }
 }
 
-/// Various states a process can be in.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum State {
-    /// Process expects to be running code. The process may not be currently
-    /// scheduled by the scheduler, but the process has work to do if it is
-    /// scheduled.
     Running,
 
-    /// Process stopped executing and returned to the kernel because it called
-    /// the `yield` syscall. This likely means it is waiting for some event to
-    /// occur, but it could also mean it has finished and doesn't need to be
-    /// scheduled again.
     Yielded,
 
-    /// The process is stopped, and its previous state was Running. This is used
-    /// if the kernel forcibly stops a process when it is in the `Running`
-    /// state. This state indicates to the kernel not to schedule the process,
-    /// but if the process is to be resumed later it should be put back in the
-    /// running state so it will execute correctly.
     StoppedRunning,
 
-    /// The process is stopped, and it was stopped while it was yielded. If this
-    /// process needs to be resumed it should be put back in the `Yield` state.
     StoppedYielded,
 
-    /// The process is stopped, and it was stopped after it faulted. This
-    /// basically means the app crashed, and the kernel decided to just stop it
-    /// and continue executing other things.
     StoppedFaulted,
 
-    /// The process has caused a fault.
     Fault,
 
-    /// The process has never actually been executed. This of course happens
-    /// when the board first boots and the kernel has not switched to any
-    /// processes yet. It can also happen if an process is terminated and all
-    /// of its state is reset as if it has not been executed yet.
     Unstarted,
 }
 
-/// The reaction the kernel should take when an app encounters a fault.
-///
-/// When an exception occurs during an app's execution (a common example is an
-/// app trying to access memory outside of its allowed regions) the system will
-/// trap back to the kernel, and the kernel has to decide what to do with the
-/// app at that point.
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum FaultResponse {
-    /// Generate a `panic!()` call and crash the entire system. This is useful
-    /// for debugging applications as the error is displayed immediately after
-    /// it occurs.
     Panic,
 
-    /// Attempt to cleanup and restart the app which caused the fault. This
-    /// resets the app's memory to how it was when the app was started and
-    /// schedules the app to run again from its init function.
     Restart,
 
-    /// Stop the app by no longer scheduling it to run.
     Stop,
 }
 
@@ -331,25 +198,12 @@ pub enum Task {
     IPC((AppId, IPCType)),
 }
 
-/// Enumeration to identify whether a function call comes directly from the
-/// kernel or from a callback subscribed through a driver.
-///
-/// An example of kernel function is the application entry point.
 #[derive(Copy, Clone, Debug)]
 pub enum FunctionCallSource {
     Kernel, // For functions coming directly from the kernel, such as `init_fn`.
     Driver(CallbackId),
 }
 
-/// Struct that defines a callback that can be passed to a process. The callback
-/// takes four arguments that are `Driver` and callback specific, so they are
-/// represented generically here.
-///
-/// Likely these four arguments will get passed as the first four register
-/// values, but this is architecture-dependent.
-///
-/// A `FunctionCall` also identifies the callback that scheduled it, if any, so
-/// that it can be unscheduled when the process unsubscribes from this callback.
 #[derive(Copy, Clone, Debug)]
 pub struct FunctionCall {
     pub source: FunctionCallSource,
@@ -360,134 +214,64 @@ pub struct FunctionCall {
     pub pc: usize,
 }
 
-/// State for helping with debugging apps.
-///
-/// These pointers and counters are not strictly required for kernel operation,
-/// but provide helpful information when an app crashes.
 struct ProcessDebug {
-    /// Where the process has started its heap in RAM.
     app_heap_start_pointer: Option<*const u8>,
 
-    /// Where the start of the stack is for the process. If the kernel does the
-    /// PIC setup for this app then we know this, otherwise we need the app to
-    /// tell us where it put its stack.
     app_stack_start_pointer: Option<*const u8>,
 
-    /// How low have we ever seen the stack pointer.
     min_stack_pointer: *const u8,
 
-    /// How many syscalls have occurred since the process started.
     syscall_count: usize,
 
-    /// What was the most recent syscall.
     last_syscall: Option<Syscall>,
 
-    /// How many callbacks were dropped because the queue was insufficiently
-    /// long.
     dropped_callback_count: usize,
 
-    /// How many times this process has entered into a fault condition and the
-    /// kernel has restarted it.
     restart_count: usize,
 
-    /// How many times this process has been paused because it exceeded its
-    /// timeslice.
     timeslice_expiration_count: usize,
 }
 
 pub struct Process<'a, C: 'static + Chip> {
-    /// Index of the process in the process table.
-    ///
-    /// Corresponds to AppId
     app_idx: usize,
 
-    /// Pointer to the main Kernel struct.
     kernel: &'static Kernel,
 
-    /// Pointer to the struct that defines the actual chip the kernel is running
-    /// on. This is used because processes have subtle hardware-based
-    /// differences. Specifically, the actual syscall interface and how
-    /// processes are switched to is architecture-specific, and how memory must
-    /// be allocated for memory protection units is also hardware-specific.
     chip: &'static C,
 
-    /// Application memory layout:
-    ///
-    /// ```text
-    ///     ╒════════ ← memory[memory.len()]
-    ///  ╔═ │ Grant
-    ///     │   ↓
-    ///  D  │ ──────  ← kernel_memory_break
-    ///  Y  │
-    ///  N  │ ──────  ← app_break               ═╗
-    ///  A  │                                    ║
-    ///  M  │   ↑                                  A
-    ///     │  Heap                              P C
-    ///  ╠═ │ ──────  ← app_heap_start           R C
-    ///     │  Data                              O E
-    ///  F  │ ──────  ← data_start_pointer       C S
-    ///  I  │ Stack                              E S
-    ///  X  │   ↓                                S I
-    ///  E  │                                    S B
-    ///  D  │ ──────  ← current_stack_pointer      L
-    ///     │                                    ║ E
-    ///  ╚═ ╘════════ ← memory[0]               ═╝
-    /// ```
-    ///
-    /// The process's memory.
     memory: &'static mut [u8],
 
-    /// Pointer to the end of the allocated (and MPU protected) grant region.
     kernel_memory_break: Cell<*const u8>,
 
-    /// Copy of where the kernel memory break is when the app is first started.
-    /// This is handy if the app is restarted so we know where to reset
-    /// the kernel_memory break to without having to recalculate it.
     original_kernel_memory_break: *const u8,
 
-    /// Pointer to the end of process RAM that has been sbrk'd to the process.
     app_break: Cell<*const u8>,
     original_app_break: *const u8,
 
-    /// Pointer to high water mark for process buffers shared through `allow`
     allow_high_water_mark: Cell<*const u8>,
 
-    /// Saved when the app switches to the kernel.
     current_stack_pointer: Cell<*const u8>,
     original_stack_pointer: *const u8,
 
-    /// Process flash segment. This is the region of nonvolatile flash that
-    /// the process occupies.
     flash: &'static [u8],
 
-    /// Collection of pointers to the TBF header in flash.
     header: tbfheader::TbfHeader,
 
-    /// State saved on behalf of the process each time the app switches to the
-    /// kernel.
     stored_state:
         Cell<<<C as Chip>::UserspaceKernelBoundary as UserspaceKernelBoundary>::StoredState>,
 
-    /// Whether the scheduler can schedule this app.
     state: Cell<State>,
 
-    /// How to deal with Faults occurring in the process
     fault_response: FaultResponse,
 
-    /// Configuration data for the MPU
     mpu_config: MapCell<<<C as Chip>::MPU as MPU>::MpuConfig>,
 
-    /// MPU regions are saved as a pointer-size pair.
     mpu_regions: [Cell<Option<mpu::Region>>; 6],
 
-    /// Essentially a list of callbacks that want to call functions in the
-    /// process.
     tasks: MapCell<RingBuffer<'a, Task>>,
 
-    /// Name of the app.
     process_name: &'static str,
 
-    /// Values kept so that we can print useful debug messages when apps fault.
     debug: MapCell<ProcessDebug>,
 }
 
@@ -497,8 +281,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
     }
 
     fn enqueue_task(&self, task: Task) -> bool {
-        // If this app is in the `Fault` state then we shouldn't schedule
-        // any work for it.
         if self.state.get() == State::Fault {
             return false;
         }
@@ -507,8 +289,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
 
         let ret = self.tasks.map_or(false, |tasks| tasks.enqueue(task));
 
-        // Make a note that we lost this callback if the enqueue function
-        // fails.
         if ret == false {
             self.debug.map(|debug| {
                 debug.dropped_callback_count += 1;
@@ -521,8 +301,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
     fn remove_pending_callbacks(&self, callback_id: CallbackId) {
         self.tasks.map(|tasks| {
             tasks.retain(|task| match task {
-                // Remove only tasks that are function calls with an id equal
-                // to `callback_id`.
                 Task::FunctionCall(function_call) => match function_call.source {
                     FunctionCallSource::Kernel => true,
                     FunctionCallSource::Driver(id) => id != callback_id,
@@ -564,35 +342,26 @@ impl<C: Chip> ProcessType for Process<'a, C> {
 
         match self.fault_response {
             FaultResponse::Panic => {
-                // process faulted. Panic and print status
                 panic!("Process {} had a fault", self.process_name);
             }
             FaultResponse::Restart => {
-                // Remove the tasks that were scheduled for the app from the
-                // amount of work queue.
                 let tasks_len = self.tasks.map_or(0, |tasks| tasks.len());
                 for _ in 0..tasks_len {
                     self.kernel.decrement_work();
                 }
 
-                // And remove those tasks
                 self.tasks.map(|tasks| {
                     tasks.empty();
                 });
 
-                // Update debug information
                 self.debug.map(|debug| {
-                    // Mark that we restarted this process.
                     debug.restart_count += 1;
 
-                    // Reset some state for the process.
                     debug.syscall_count = 0;
                     debug.last_syscall = None;
                     debug.dropped_callback_count = 0;
                 });
 
-                // We are going to start this process over again, so need
-                // the init_fn location.
                 let app_flash_address = self.flash_start();
                 let init_fn = unsafe {
                     app_flash_address.offset(self.header.get_init_function_offset() as isize)
@@ -600,18 +369,15 @@ impl<C: Chip> ProcessType for Process<'a, C> {
                 };
                 self.state.set(State::Unstarted);
 
-                // Need to reset the grant region.
                 unsafe {
                     self.grant_ptrs_reset();
                 }
                 self.kernel_memory_break
                     .set(self.original_kernel_memory_break);
 
-                // Reset other memory pointers.
                 self.app_break.set(self.original_app_break);
                 self.current_stack_pointer.set(self.original_stack_pointer);
 
-                // And queue up this app to be restarted.
                 let flash_protected_size = self.header.get_protected_size() as usize;
                 let flash_app_start = app_flash_address as usize + flash_protected_size;
 
@@ -630,30 +396,19 @@ impl<C: Chip> ProcessType for Process<'a, C> {
                 self.kernel.increment_work();
             }
             FaultResponse::Stop => {
-                // This looks a lot like restart, except we just leave the app
-                // how it faulted and mark it as `StoppedFaulted`. By clearing
-                // all of the app's todo work it will not be scheduled, and
-                // clearing all of the grant regions will cause capsules to drop
-                // this app as well.
-
-                // Remove the tasks that were scheduled for the app from the
-                // amount of work queue.
                 let tasks_len = self.tasks.map_or(0, |tasks| tasks.len());
                 for _ in 0..tasks_len {
                     self.kernel.decrement_work();
                 }
 
-                // And remove those tasks
                 self.tasks.map(|tasks| {
                     tasks.empty();
                 });
 
-                // Clear any grant regions this app has setup with any capsules.
                 unsafe {
                     self.grant_ptrs_reset();
                 }
 
-                // Mark the app as stopped so the scheduler won't try to run it.
                 self.state.set(State::StoppedFaulted);
             }
         }
@@ -705,8 +460,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
             self.debug.map(|debug| {
                 debug.app_stack_start_pointer = Some(stack_pointer);
 
-                // We also reset the minimum stack pointer because whatever value
-                // we had could be entirely wrong by now.
                 debug.min_stack_pointer = stack_pointer;
             });
         }
@@ -752,7 +505,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
                 }
             }
 
-            // Not enough room in Process struct to store the MPU region.
             None
         })
     }
@@ -791,11 +543,8 @@ impl<C: Chip> ProcessType for Process<'a, C> {
         size: usize,
     ) -> Result<Option<AppSlice<Shared, u8>>, ReturnCode> {
         if buf_start_addr == ptr::null_mut() {
-            // A null buffer means pass in `None` to the capsule
             Ok(None)
         } else if self.in_app_owned_memory(buf_start_addr, size) {
-            // Valid slice, we need to adjust the app's watermark
-            // in_app_owned_memory eliminates this offset actually wrapping
             let buf_end_addr = buf_start_addr.wrapping_add(size);
             let new_water_mark = max(self.allow_high_water_mark.get(), buf_end_addr);
             self.allow_high_water_mark.set(new_water_mark);
@@ -812,8 +561,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
     unsafe fn alloc(&self, size: usize, align: usize) -> Option<&mut [u8]> {
         self.mpu_config.and_then(|mut config| {
             let new_break_unaligned = self.kernel_memory_break.get().offset(-(size as isize));
-            // The alignment must be a power of two, 2^a. The expression `!(align - 1)` then
-            // returns a mask with leading ones, followed by `a` trailing zeros.
             let alignment_mask = !(align - 1);
             let new_break = (new_break_unaligned as usize & alignment_mask) as *const u8;
             if new_break < self.app_break.get() {
@@ -853,15 +600,8 @@ impl<C: Chip> ProcessType for Process<'a, C> {
     }
 
     unsafe fn set_process_function(&self, callback: FunctionCall) {
-        // First we need to get how much memory is available for this app's
-        // stack. Since the stack is at the bottom of the process's memory
-        // region, this is straightforward.
         let remaining_stack_bytes = self.sp() as usize - self.memory.as_ptr() as usize;
 
-        // Next we should see if we can actually add the frame to the process's
-        // stack. Architecture-specific code handles actually doing the push
-        // since we don't know the details of exactly what the stack frames look
-        // like.
         let mut stored_state = self.stored_state.get();
 
         match self.chip.userspace_kernel_boundary().set_process_function(
@@ -871,32 +611,15 @@ impl<C: Chip> ProcessType for Process<'a, C> {
             callback,
         ) {
             Ok(stack_bottom) => {
-                // If we got an `Ok` with the new stack pointer we are all
-                // set and should mark that this process is ready to be
-                // scheduled.
-
-                // We just setup up a new callback to do, which means this
-                // process wants to execute, so we set that there is work to
-                // be done.
                 self.kernel.increment_work();
 
-                // Move this process to the "running" state so the scheduler
-                // will schedule it.
                 self.state.set(State::Running);
 
-                // Update helpful debugging metadata.
                 self.current_stack_pointer.set(stack_bottom as *mut u8);
                 self.debug_set_max_stack_depth();
             }
 
             Err(bad_stack_bottom) => {
-                // If we got an Error, then there was not enough room on the
-                // stack to allow the process to execute this function given the
-                // details of the particular architecture this is running on.
-                // This process has essentially faulted, so we mark it as such.
-                // We also update the debugging metadata so that if the process
-                // fault message prints then it should be easier to debug that
-                // the process exceeded its stack.
                 self.debug.map(|debug| {
                     let bad_stack_bottom = bad_stack_bottom as *const u8;
                     if bad_stack_bottom < debug.min_stack_pointer {
@@ -918,16 +641,11 @@ impl<C: Chip> ProcessType for Process<'a, C> {
         self.current_stack_pointer.set(stack_pointer as *const u8);
         self.stored_state.set(stored_state);
 
-        // Update debug state as needed after running this process.
         self.debug.map(|debug| {
-            // Update max stack depth if needed.
             if self.current_stack_pointer.get() < debug.min_stack_pointer {
                 debug.min_stack_pointer = self.current_stack_pointer.get();
             }
 
-            // More debugging help. If this occurred because of a timeslice
-            // expiration, mark that so we can check later if a process is
-            // exceeding its timeslices too often.
             if switch_reason == syscall::ContextSwitchReason::TimesliceExpired {
                 debug.timeslice_expiration_count += 1;
             }
@@ -963,7 +681,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
     }
 
     unsafe fn process_detail_fmt(&self, writer: &mut dyn Write) {
-        // Flash
         let flash_end = self.flash.as_ptr().add(self.flash.len()) as usize;
         let flash_start = self.flash.as_ptr() as usize;
         let flash_protected_size = self.header.get_protected_size() as usize;
@@ -971,7 +688,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
         let flash_app_size = flash_end - flash_app_start;
         let flash_init_fn = flash_start + self.header.get_init_function_offset() as usize;
 
-        // SRAM addresses
         let sram_end = self.memory.as_ptr().add(self.memory.len()) as usize;
         let sram_grant_start = self.kernel_memory_break.get() as usize;
         let sram_heap_end = self.app_break.get() as usize;
@@ -986,11 +702,9 @@ impl<C: Chip> ProcessType for Process<'a, C> {
                 .map_or(ptr::null(), |debug| debug.min_stack_pointer) as usize;
         let sram_start = self.memory.as_ptr() as usize;
 
-        // SRAM sizes
         let sram_grant_size = sram_end - sram_grant_start;
         let sram_grant_allocated = sram_end - sram_grant_start;
 
-        // application statistics
         let events_queued = self.tasks.map_or(0, |tasks| tasks.len());
         let syscall_count = self.debug.map_or(0, |debug| debug.syscall_count);
         let last_syscall = self.debug.map(|debug| debug.last_syscall);
@@ -1127,7 +841,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
             writer,
         );
 
-        // Display the current state of the MPU for this process.
         self.mpu_config.map(|config| {
             let _ = writer.write_fmt(format_args!("{}", config));
         });
@@ -1163,22 +876,17 @@ impl<C: 'static + Chip> Process<'a, C> {
         if let Some(tbf_header) = tbfheader::parse_and_validate_tbf_header(app_flash_address) {
             let app_flash_size = tbf_header.get_total_size() as usize;
 
-            // If this isn't an app (i.e. it is padding) or it is an app but it
-            // isn't enabled, then we can skip it but increment past its flash.
             if !tbf_header.is_app() || !tbf_header.enabled() {
                 return (None, app_flash_size, 0);
             }
 
-            // Otherwise, actually load the app.
             let mut min_app_ram_size = tbf_header.get_minimum_app_ram_size() as usize;
             let process_name = tbf_header.get_package_name();
             let init_fn =
                 app_flash_address.offset(tbf_header.get_init_function_offset() as isize) as usize;
 
-            // Initialize MPU region configuration.
             let mut mpu_config: <<C as Chip>::MPU as MPU>::MpuConfig = Default::default();
 
-            // Allocate MPU region for flash.
             if let None = chip.mpu().allocate_region(
                 app_flash_address,
                 app_flash_size,
@@ -1189,25 +897,16 @@ impl<C: 'static + Chip> Process<'a, C> {
                 return (None, app_flash_size, 0);
             }
 
-            // Determine how much space we need in the application's
-            // memory space just for kernel and grant state. We need to make
-            // sure we allocate enough memory just for that.
-
-            // Make room for grant pointers.
             let grant_ptr_size = mem::size_of::<*const usize>();
             let grant_ptrs_num = kernel.get_grant_count_and_finalize();
             let grant_ptrs_offset = grant_ptrs_num * grant_ptr_size;
 
-            // Allocate memory for callback ring buffer.
             let callback_size = mem::size_of::<Task>();
             let callback_len = 10;
             let callbacks_offset = callback_len * callback_size;
 
-            // Make room to store this process's metadata.
             let process_struct_offset = mem::size_of::<Process<C>>();
 
-            // Initial sizes of the app-owned and kernel-owned parts of process memory.
-            // Provide the app with plenty of initial process accessible memory.
             let initial_kernel_memory_size =
                 grant_ptrs_offset + callbacks_offset + process_struct_offset;
             let initial_app_memory_size = 3 * 1024;
@@ -1216,10 +915,8 @@ impl<C: 'static + Chip> Process<'a, C> {
                 min_app_ram_size = initial_app_memory_size;
             }
 
-            // Minimum memory size for the process.
             let min_total_memory_size = min_app_ram_size + initial_kernel_memory_size;
 
-            // Determine where process memory will go and allocate MPU region for app-owned memory.
             let (memory_start, memory_size) = match chip.mpu().allocate_app_memory_region(
                 remaining_app_memory as *const u8,
                 remaining_app_memory_size,
@@ -1231,55 +928,39 @@ impl<C: 'static + Chip> Process<'a, C> {
             ) {
                 Some((memory_start, memory_size)) => (memory_start, memory_size),
                 None => {
-                    // Failed to load process. Insufficient memory.
                     return (None, app_flash_size, 0);
                 }
             };
 
-            // Compute how much padding before start of process memory.
             let memory_padding_size = (memory_start as usize) - (remaining_app_memory as usize);
 
-            // Set up process memory.
             let app_memory = slice::from_raw_parts_mut(memory_start as *mut u8, memory_size);
 
-            // Set the initial process stack and memory to 3072 bytes.
             let initial_stack_pointer = memory_start.add(initial_app_memory_size);
             let initial_sbrk_pointer = memory_start.add(initial_app_memory_size);
 
-            // Set up initial grant region.
             let mut kernel_memory_break = app_memory.as_mut_ptr().add(app_memory.len());
 
-            // Now that we know we have the space we can setup the grant
-            // pointers.
             kernel_memory_break = kernel_memory_break.offset(-(grant_ptrs_offset as isize));
 
-            // Set all pointers to null.
             let opts =
                 slice::from_raw_parts_mut(kernel_memory_break as *mut *const usize, grant_ptrs_num);
             for opt in opts.iter_mut() {
                 *opt = ptr::null()
             }
 
-            // Now that we know we have the space we can setup the memory
-            // for the callbacks.
             kernel_memory_break = kernel_memory_break.offset(-(callbacks_offset as isize));
 
-            // Set up ring buffer.
             let callback_buf =
                 slice::from_raw_parts_mut(kernel_memory_break as *mut Task, callback_len);
             let tasks = RingBuffer::new(callback_buf);
 
-            // Last thing is the process struct.
             kernel_memory_break = kernel_memory_break.offset(-(process_struct_offset as isize));
             let process_struct_memory_location = kernel_memory_break;
 
-            // Determine the debug information to the best of our
-            // understanding. If the app is doing all of the PIC fixup and
-            // memory management we don't know much.
             let app_heap_start_pointer = None;
             let app_stack_start_pointer = None;
 
-            // Create the Process struct in the app grant region.
             let mut process: &mut Process<C> =
                 &mut *(process_struct_memory_location as *mut Process<'static, C>);
 
@@ -1339,7 +1020,6 @@ impl<C: 'static + Chip> Process<'a, C> {
                 }));
             });
 
-            // Handle any architecture-specific requirements for a new process
             let mut stored_state = process.stored_state.get();
             match chip.userspace_kernel_boundary().initialize_new_process(
                 process.sp(),
@@ -1358,7 +1038,6 @@ impl<C: 'static + Chip> Process<'a, C> {
                 }
             };
 
-            // Mark this process as having something to do (it has to start!)
             kernel.increment_work();
 
             return (
@@ -1375,11 +1054,6 @@ impl<C: 'static + Chip> Process<'a, C> {
         self.current_stack_pointer.get() as *const usize
     }
 
-    /// Checks if the buffer represented by the passed in base pointer and size
-    /// are within the memory bounds currently exposed to the processes (i.e.
-    /// ending at `app_break`. If this method returns true, the buffer
-    /// is guaranteed to be accessible to the process and to not overlap with
-    /// the grant region.
     fn in_app_owned_memory(&self, buf_start_addr: *const u8, size: usize) -> bool {
         let buf_end_addr = buf_start_addr.wrapping_add(size);
 
@@ -1388,7 +1062,6 @@ impl<C: 'static + Chip> Process<'a, C> {
             && buf_end_addr <= self.app_break.get()
     }
 
-    /// Reset all `grant_ptr`s to NULL.
     #[allow(clippy::cast_ptr_alignment)]
     unsafe fn grant_ptrs_reset(&self) {
         let grant_ptrs_num = self.kernel.get_grant_count_and_finalize();
