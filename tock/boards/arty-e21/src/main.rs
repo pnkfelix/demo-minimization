@@ -2,7 +2,6 @@
 #![no_main]
 #![feature(const_fn, in_band_lifetimes)]
 
-use capsules::virtual_alarm::{VirtualMuxAlarm};
 use kernel::capabilities;
 use kernel::Platform;
 use kernel::{create_capability, static_init};
@@ -36,16 +35,7 @@ static mut PROCESSES: [Option<&'static dyn kernel::procs::ProcessType>; NUM_PROC
 #[link_section = ".stack_buffer"]
 pub static mut STACK_MEMORY: [u8; 0x1000] = [0; 0x1000];
 
-struct ArtyE21 {
-    _console: &'static capsules::console::Console<'static>,
-    _gpio: &'static capsules::gpio::GPIO<'static>,
-    _alarm: &'static capsules::alarm::AlarmDriver<
-        'static,
-        VirtualMuxAlarm<'static, rv32i::machine_timer::MachineTimer<'static>>,
-    >,
-    _led: &'static capsules::led::LED<'static>,
-    _button: &'static capsules::button::Button<'static>,
-}
+struct ArtyE21 { }
 
 impl Platform for ArtyE21 {
     fn with_driver<F, R>(&self, _: usize, _: F) -> R
