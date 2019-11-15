@@ -7,6 +7,7 @@ use kernel::capabilities;
 use kernel::Platform;
 use kernel::{create_capability, static_init};
 
+#[cfg(not_now)]
 mod timer_test {
 #![allow(dead_code)]
 
