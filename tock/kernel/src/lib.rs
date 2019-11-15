@@ -3067,12 +3067,6 @@ impl<C: Chip> ProcessType for Process<'a, C> {
             flash_start
         ));
 
-        self.chip.userspace_kernel_boundary().process_detail_fmt(
-            self.sp(),
-            &self.stored_state.get(),
-            writer,
-        );
-
         self.mpu_config.map(|config| {
             let _ = writer.write_fmt(format_args!("{}", config));
         });
@@ -3205,7 +3199,7 @@ impl<C: 'static + Chip> Process<'a, C> {
 
             process.flash = slice::from_raw_parts(app_flash_address, app_flash_size);
 
-            process.stored_state = Cell::new(Default::default());
+            // process.stored_state = Cell::new(Default::default());
             process.state = Cell::new(State::Unstarted);
             process.fault_response = fault_response;
 
@@ -3246,6 +3240,7 @@ impl<C: 'static + Chip> Process<'a, C> {
                 }));
             });
 
+            /*
             let mut stored_state = process.stored_state.get();
             match chip.userspace_kernel_boundary().initialize_new_process(
                 process.sp(),
@@ -3263,6 +3258,7 @@ impl<C: 'static + Chip> Process<'a, C> {
                     return (None, app_flash_size, 0);
                 }
             };
+             */
 
             kernel.increment_work();
 
