@@ -1,5 +1,3 @@
-//! Board file for the SiFive E21 Bitstream running on the Arty FPGA
-
 #![no_std]
 #![no_main]
 #![feature(const_fn, in_band_lifetimes)]
@@ -66,12 +64,10 @@ impl Write for Writer {
     }
 }
 
-/// Panic handler.
 #[cfg(not(test))]
 #[no_mangle]
 #[panic_handler]
 pub unsafe extern "C" fn panic_fmt(pi: &PanicInfo) -> ! {
-    // turn off the non panic leds, just in case
     let led_green = &arty_e21::gpio::PORT[19];
     gpio::Pin::make_output(led_green);
     gpio::Pin::set(led_green);
@@ -86,29 +82,20 @@ pub unsafe extern "C" fn panic_fmt(pi: &PanicInfo) -> ! {
 }
 }
 
-// State for loading and holding applications.
-
-// Number of concurrent processes this platform supports.
 const NUM_PROCS: usize = 4;
 
-// How should the kernel respond when a process faults.
 const FAULT_RESPONSE: kernel::procs::FaultResponse = kernel::procs::FaultResponse::Panic;
 
-// RAM to be shared by all application processes.
 #[link_section = ".app_memory"]
 static mut APP_MEMORY: [u8; 8192] = [0; 8192];
 
-// Actual memory for holding the active process structures.
 static mut PROCESSES: [Option<&'static dyn kernel::procs::ProcessType>; NUM_PROCS] =
     [None, None, None, None];
 
-/// Dummy buffer that causes the linker to reserve enough space for the stack.
 #[no_mangle]
 #[link_section = ".stack_buffer"]
 pub static mut STACK_MEMORY: [u8; 0x1000] = [0; 0x1000];
 
-/// A structure representing this platform that holds references to all
-/// capsules for this platform.
 struct ArtyE21 {
     console: &'static capsules::console::Console<'static>,
     gpio: &'static capsules::gpio::GPIO<'static>,
@@ -118,10 +105,8 @@ struct ArtyE21 {
     >,
     led: &'static capsules::led::LED<'static>,
     button: &'static capsules::button::Button<'static>,
-    // ipc: kernel::ipc::IPC,
 }
 
-/// Mapping of integer syscalls to objects that implement syscalls.
 impl Platform for ArtyE21 {
     fn with_driver<F, R>(&self, driver_num: usize, f: F) -> R
     where
@@ -135,19 +120,13 @@ impl Platform for ArtyE21 {
             capsules::led::DRIVER_NUM => f(Some(self.led)),
             capsules::button::DRIVER_NUM => f(Some(self.button)),
 
-            // kernel::ipc::DRIVER_NUM => f(Some(&self.ipc)),
             _ => f(None),
         }
     }
 }
 
-/// Reset Handler.
-///
-/// This function is called from the arch crate after some very basic RISC-V
-/// setup.
 #[no_mangle]
 pub unsafe fn reset_handler() {
-    // Basic setup of the platform.
     rv32i::init_memory();
 
     let chip = static_init!(arty_e21::chip::ArtyExx, arty_e21::chip::ArtyExx::new());
@@ -159,14 +138,12 @@ pub unsafe fn reset_handler() {
 
     let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
 
-    // Configure kernel debug gpios as early as possible
     kernel::debug::assign_gpios(
         Some(&arty_e21::gpio::PORT[0]), // Red
         Some(&arty_e21::gpio::PORT[1]),
         Some(&arty_e21::gpio::PORT[8]),
     );
 
-    // Create a shared UART channel for the console and for kernel debug.
     let uart_mux = static_init!(
         MuxUart<'static>,
         MuxUart::new(
@@ -182,32 +159,16 @@ pub unsafe fn reset_handler() {
 
     let console = components::console::ConsoleComponent::new(board_kernel, uart_mux).finalize(());
 
-    // Create a shared virtualization mux layer on top of a single hardware
-    // alarm.
     let mux_alarm = static_init!(
         MuxAlarm<'static, rv32i::machine_timer::MachineTimer>,
         MuxAlarm::new(&rv32i::machine_timer::MACHINETIMER)
     );
     hil::time::Alarm::set_client(&rv32i::machine_timer::MACHINETIMER, mux_alarm);
 
-    // Alarm
     let alarm = components::alarm::AlarmDriverComponent::new(board_kernel, mux_alarm).finalize(
         components::alarm_component_helper!(rv32i::machine_timer::MachineTimer),
     );
 
-    // TEST for timer
-    //
-    // let virtual_alarm_test = static_init!(
-    //     VirtualMuxAlarm<'static, rv32i::machine_timer::MachineTimer>,
-    //     VirtualMuxAlarm::new(mux_alarm)
-    // );
-    // let timertest = static_init!(
-    //     timer_test::TimerTest<'static, VirtualMuxAlarm<'static, rv32i::machine_timer::MachineTimer>>,
-    //     timer_test::TimerTest::new(virtual_alarm_test)
-    // );
-    // virtual_alarm_test.set_client(timertest);
-
-    // LEDs
     let led_pins = static_init!(
         [(
             &'static dyn kernel::hil::gpio::Pin,
@@ -215,17 +176,14 @@ pub unsafe fn reset_handler() {
         ); 3],
         [
             (
-                // Red
                 &arty_e21::gpio::PORT[0],
                 capsules::led::ActivationMode::ActiveHigh
             ),
             (
-                // Green
                 &arty_e21::gpio::PORT[1],
                 capsules::led::ActivationMode::ActiveHigh
             ),
             (
-                // Blue
                 &arty_e21::gpio::PORT[2],
                 capsules::led::ActivationMode::ActiveHigh
             ),
@@ -236,7 +194,6 @@ pub unsafe fn reset_handler() {
         capsules::led::LED::new(led_pins)
     );
 
-    // BUTTONs
     let button_pins = static_init!(
         [(
             &'static dyn kernel::hil::gpio::InterruptValuePin,
@@ -262,7 +219,6 @@ pub unsafe fn reset_handler() {
         btn.set_client(button);
     }
 
-    // set GPIO driver controlling remaining GPIO pins
     let gpio_pins = static_init!(
         [&'static dyn kernel::hil::gpio::InterruptValuePin; 3],
         [
@@ -299,10 +255,8 @@ pub unsafe fn reset_handler() {
         alarm: alarm,
         led: led,
         button: button,
-        // ipc: kernel::ipc::IPC::new(board_kernel),
     };
 
-    // Create virtual device for kernel debug.
     let debugger_uart = static_init!(UartDevice, UartDevice::new(uart_mux, false));
     debugger_uart.setup();
     let ring_buffer = static_init!(
@@ -321,16 +275,9 @@ pub unsafe fn reset_handler() {
     );
     kernel::debug::set_debug_writer_wrapper(debug_wrapper);
 
-    // arty_e21::uart::UART0.initialize_gpio_pins(&arty_e21::gpio::PORT[17], &arty_e21::gpio::PORT[16]);
-
     debug!("Initialization complete. Entering main loop.");
 
-    // timertest.start();
-
     extern "C" {
-        /// Beginning of the ROM region containing app images.
-        ///
-        /// This symbol is defined in the linker script.
         static _sapps: u8;
     }
 
