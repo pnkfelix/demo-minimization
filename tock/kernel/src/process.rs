@@ -55,90 +55,91 @@ pub fn load_processes<C: Chip>(
     }
 }
 
+
 pub trait ProcessType {
-    fn appid(&self) -> AppId;
+    fn appid(&self) -> AppId { loop { } }
 
-    fn enqueue_task(&self, task: Task) -> bool;
+    fn enqueue_task(&self, task: Task) -> bool { loop { } }
 
-    fn dequeue_task(&self) -> Option<Task>;
+    fn dequeue_task(&self) -> Option<Task> { loop { } }
 
-    fn remove_pending_callbacks(&self, callback_id: CallbackId);
+    fn remove_pending_callbacks(&self, callback_id: CallbackId) { loop { } }
 
-    fn get_state(&self) -> State;
+    fn get_state(&self) -> State { loop { } }
 
-    fn set_yielded_state(&self);
+    fn set_yielded_state(&self) { loop { } }
 
-    fn stop(&self);
+    fn stop(&self) { loop { } }
 
-    fn resume(&self);
+    fn resume(&self) { loop { } }
 
-    fn set_fault_state(&self);
+    fn set_fault_state(&self) { loop { } }
 
-    fn get_process_name(&self) -> &'static str;
+    fn get_process_name(&self) -> &'static str { loop { } }
 
-    fn brk(&self, new_break: *const u8) -> Result<*const u8, Error>;
+    fn brk(&self, new_break: *const u8) -> Result<*const u8, Error> { loop { } }
 
-    fn sbrk(&self, increment: isize) -> Result<*const u8, Error>;
+    fn sbrk(&self, increment: isize) -> Result<*const u8, Error> { loop { } }
 
-    fn mem_start(&self) -> *const u8;
+    fn mem_start(&self) -> *const u8 { loop { } }
 
-    fn mem_end(&self) -> *const u8;
+    fn mem_end(&self) -> *const u8 { loop { } }
 
-    fn flash_start(&self) -> *const u8;
+    fn flash_start(&self) -> *const u8 { loop { } }
 
-    fn flash_end(&self) -> *const u8;
+    fn flash_end(&self) -> *const u8 { loop { } }
 
-    fn kernel_memory_break(&self) -> *const u8;
+    fn kernel_memory_break(&self) -> *const u8 { loop { } }
 
-    fn number_writeable_flash_regions(&self) -> usize;
+    fn number_writeable_flash_regions(&self) -> usize { loop { } }
 
-    fn get_writeable_flash_region(&self, region_index: usize) -> (u32, u32);
+    fn get_writeable_flash_region(&self, region_index: usize) -> (u32, u32) { loop { } }
 
-    fn update_stack_start_pointer(&self, stack_pointer: *const u8);
+    fn update_stack_start_pointer(&self, stack_pointer: *const u8) { loop { } }
 
-    fn update_heap_start_pointer(&self, heap_pointer: *const u8);
+    fn update_heap_start_pointer(&self, heap_pointer: *const u8) { loop { } }
 
     fn allow(
         &self,
         buf_start_addr: *const u8,
         size: usize,
-    ) -> Result<Option<AppSlice<Shared, u8>>, ReturnCode>;
+    ) -> Result<Option<AppSlice<Shared, u8>>, ReturnCode> { loop { } }
 
-    fn flash_non_protected_start(&self) -> *const u8;
+    fn flash_non_protected_start(&self) -> *const u8 { loop { } }
 
-    fn setup_mpu(&self);
+    fn setup_mpu(&self) { loop { } }
 
     fn add_mpu_region(
         &self,
         unallocated_memory_start: *const u8,
         unallocated_memory_size: usize,
         min_region_size: usize,
-    ) -> Option<mpu::Region>;
+    ) -> Option<mpu::Region> { loop { } }
 
-    unsafe fn alloc(&self, size: usize, align: usize) -> Option<&mut [u8]>;
+    unsafe fn alloc(&self, size: usize, align: usize) -> Option<&mut [u8]> { loop { } }
 
-    unsafe fn free(&self, _: *mut u8);
+    unsafe fn free(&self, _: *mut u8) { loop { } }
 
-    unsafe fn grant_ptr(&self, grant_num: usize) -> *mut *mut u8;
+    unsafe fn grant_ptr(&self, grant_num: usize) -> *mut *mut u8 { loop { } }
 
-    unsafe fn set_syscall_return_value(&self, return_value: isize);
+    unsafe fn set_syscall_return_value(&self, return_value: isize) { loop { } }
 
-    unsafe fn set_process_function(&self, callback: FunctionCall);
+    unsafe fn set_process_function(&self, callback: FunctionCall) { loop { } }
 
-    unsafe fn switch_to(&self) -> Option<syscall::ContextSwitchReason>;
+    unsafe fn switch_to(&self) -> Option<syscall::ContextSwitchReason> { loop { } }
 
-    unsafe fn fault_fmt(&self, writer: &mut dyn Write);
-    unsafe fn process_detail_fmt(&self, writer: &mut dyn Write);
+    unsafe fn fault_fmt(&self, writer: &mut dyn Write) { loop { } }
+    unsafe fn process_detail_fmt(&self, writer: &mut dyn Write) { loop { } }
 
-    fn debug_syscall_count(&self) -> usize;
+    fn debug_syscall_count(&self) -> usize { loop { } }
 
-    fn debug_dropped_callback_count(&self) -> usize;
+    fn debug_dropped_callback_count(&self) -> usize { loop { } }
 
-    fn debug_restart_count(&self) -> usize;
+    fn debug_restart_count(&self) -> usize { loop { } }
 
-    fn debug_timeslice_expiration_count(&self) -> usize;
+    fn debug_timeslice_expiration_count(&self) -> usize { loop { } }
 
-    fn debug_timeslice_expired(&self);
+    fn debug_timeslice_expired(&self) { loop { } }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -150,14 +151,7 @@ pub enum Error {
 }
 
 impl From<Error> for ReturnCode {
-    fn from(err: Error) -> ReturnCode {
-        match err {
-            Error::OutOfMemory => ReturnCode::ENOMEM,
-            Error::AddressOutOfBounds => ReturnCode::EINVAL,
-            Error::NoSuchApp => ReturnCode::EINVAL,
-            Error::KernelError => ReturnCode::FAIL,
-        }
-    }
+    fn from(err: Error) -> ReturnCode { loop { } }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -276,409 +270,89 @@ pub struct Process<'a, C: 'static + Chip> {
 }
 
 impl<C: Chip> ProcessType for Process<'a, C> {
-    fn appid(&self) -> AppId {
-        AppId::new(self.kernel, self.app_idx)
-    }
+    fn appid(&self) -> AppId { loop { } }
 
-    fn enqueue_task(&self, task: Task) -> bool {
-        if self.state.get() == State::Fault {
-            return false;
-        }
+    fn enqueue_task(&self, task: Task) -> bool { loop { } }
 
-        self.kernel.increment_work();
+    fn remove_pending_callbacks(&self, callback_id: CallbackId) { loop { } }
 
-        let ret = self.tasks.map_or(false, |tasks| tasks.enqueue(task));
+    fn get_state(&self) -> State { loop { } }
 
-        if ret == false {
-            self.debug.map(|debug| {
-                debug.dropped_callback_count += 1;
-            });
-        }
+    fn set_yielded_state(&self) { loop { } }
 
-        ret
-    }
+    fn stop(&self) { loop { } }
 
-    fn remove_pending_callbacks(&self, callback_id: CallbackId) {
-        self.tasks.map(|tasks| {
-            tasks.retain(|task| match task {
-                Task::FunctionCall(function_call) => match function_call.source {
-                    FunctionCallSource::Kernel => true,
-                    FunctionCallSource::Driver(id) => id != callback_id,
-                },
-                _ => true,
-            });
-        });
-    }
+    fn resume(&self) { loop { } }
 
-    fn get_state(&self) -> State {
-        self.state.get()
-    }
+    fn set_fault_state(&self) { loop { } }
 
-    fn set_yielded_state(&self) {
-        if self.state.get() == State::Running {
-            self.state.set(State::Yielded);
-            self.kernel.decrement_work();
-        }
-    }
+    fn dequeue_task(&self) -> Option<Task> { loop { } }
 
-    fn stop(&self) {
-        match self.state.get() {
-            State::Running => self.state.set(State::StoppedRunning),
-            State::Yielded => self.state.set(State::StoppedYielded),
-            _ => {} // Do nothing
-        }
-    }
+    fn mem_start(&self) -> *const u8 { loop { } }
 
-    fn resume(&self) {
-        match self.state.get() {
-            State::StoppedRunning => self.state.set(State::Running),
-            State::StoppedYielded => self.state.set(State::Yielded),
-            _ => {} // Do nothing
-        }
-    }
+    fn mem_end(&self) -> *const u8 { loop { } }
 
-    fn set_fault_state(&self) {
-        self.state.set(State::Fault);
+    fn flash_start(&self) -> *const u8 { loop { } }
 
-        match self.fault_response {
-            FaultResponse::Panic => {
-                panic!("Process {} had a fault", self.process_name);
-            }
-            FaultResponse::Restart => {
-                let tasks_len = self.tasks.map_or(0, |tasks| tasks.len());
-                for _ in 0..tasks_len {
-                    self.kernel.decrement_work();
-                }
+    fn flash_non_protected_start(&self) -> *const u8 { loop { } }
 
-                self.tasks.map(|tasks| {
-                    tasks.empty();
-                });
+    fn flash_end(&self) -> *const u8 { loop { } }
 
-                self.debug.map(|debug| {
-                    debug.restart_count += 1;
+    fn kernel_memory_break(&self) -> *const u8 { loop { } }
 
-                    debug.syscall_count = 0;
-                    debug.last_syscall = None;
-                    debug.dropped_callback_count = 0;
-                });
+    fn number_writeable_flash_regions(&self) -> usize { loop { } }
 
-                let app_flash_address = self.flash_start();
-                let init_fn = unsafe {
-                    app_flash_address.offset(self.header.get_init_function_offset() as isize)
-                        as usize
-                };
-                self.state.set(State::Unstarted);
+    fn get_writeable_flash_region(&self, region_index: usize) -> (u32, u32) { loop { } }
 
-                unsafe {
-                    self.grant_ptrs_reset();
-                }
-                self.kernel_memory_break
-                    .set(self.original_kernel_memory_break);
+    fn update_stack_start_pointer(&self, stack_pointer: *const u8) { loop { } }
 
-                self.app_break.set(self.original_app_break);
-                self.current_stack_pointer.set(self.original_stack_pointer);
+    fn update_heap_start_pointer(&self, heap_pointer: *const u8) { loop { } }
 
-                let flash_protected_size = self.header.get_protected_size() as usize;
-                let flash_app_start = app_flash_address as usize + flash_protected_size;
-
-                self.tasks.map(|tasks| {
-                    tasks.empty();
-                    tasks.enqueue(Task::FunctionCall(FunctionCall {
-                        source: FunctionCallSource::Kernel,
-                        pc: init_fn,
-                        argument0: flash_app_start,
-                        argument1: self.memory.as_ptr() as usize,
-                        argument2: self.memory.len() as usize,
-                        argument3: self.app_break.get() as usize,
-                    }));
-                });
-
-                self.kernel.increment_work();
-            }
-            FaultResponse::Stop => {
-                let tasks_len = self.tasks.map_or(0, |tasks| tasks.len());
-                for _ in 0..tasks_len {
-                    self.kernel.decrement_work();
-                }
-
-                self.tasks.map(|tasks| {
-                    tasks.empty();
-                });
-
-                unsafe {
-                    self.grant_ptrs_reset();
-                }
-
-                self.state.set(State::StoppedFaulted);
-            }
-        }
-    }
-
-    fn dequeue_task(&self) -> Option<Task> {
-        self.tasks.map_or(None, |tasks| {
-            tasks.dequeue().map(|cb| {
-                self.kernel.decrement_work();
-                cb
-            })
-        })
-    }
-
-    fn mem_start(&self) -> *const u8 {
-        self.memory.as_ptr()
-    }
-
-    fn mem_end(&self) -> *const u8 {
-        unsafe { self.memory.as_ptr().add(self.memory.len()) }
-    }
-
-    fn flash_start(&self) -> *const u8 {
-        self.flash.as_ptr()
-    }
-
-    fn flash_non_protected_start(&self) -> *const u8 {
-        ((self.flash.as_ptr() as usize) + self.header.get_protected_size() as usize) as *const u8
-    }
-
-    fn flash_end(&self) -> *const u8 {
-        unsafe { self.flash.as_ptr().add(self.flash.len()) }
-    }
-
-    fn kernel_memory_break(&self) -> *const u8 {
-        self.kernel_memory_break.get()
-    }
-
-    fn number_writeable_flash_regions(&self) -> usize {
-        self.header.number_writeable_flash_regions()
-    }
-
-    fn get_writeable_flash_region(&self, region_index: usize) -> (u32, u32) {
-        self.header.get_writeable_flash_region(region_index)
-    }
-
-    fn update_stack_start_pointer(&self, stack_pointer: *const u8) {
-        if stack_pointer >= self.mem_start() && stack_pointer < self.mem_end() {
-            self.debug.map(|debug| {
-                debug.app_stack_start_pointer = Some(stack_pointer);
-
-                debug.min_stack_pointer = stack_pointer;
-            });
-        }
-    }
-
-    fn update_heap_start_pointer(&self, heap_pointer: *const u8) {
-        if heap_pointer >= self.mem_start() && heap_pointer < self.mem_end() {
-            self.debug.map(|debug| {
-                debug.app_heap_start_pointer = Some(heap_pointer);
-            });
-        }
-    }
-
-    fn setup_mpu(&self) {
-        self.mpu_config.map(|config| {
-            self.chip.mpu().configure_mpu(&config);
-        });
-    }
+    fn setup_mpu(&self) { loop { } }
 
     fn add_mpu_region(
         &self,
         unallocated_memory_start: *const u8,
         unallocated_memory_size: usize,
         min_region_size: usize,
-    ) -> Option<mpu::Region> {
-        self.mpu_config.and_then(|mut config| {
-            let new_region = self.chip.mpu().allocate_region(
-                unallocated_memory_start,
-                unallocated_memory_size,
-                min_region_size,
-                mpu::Permissions::ReadWriteOnly,
-                &mut config,
-            );
+    ) -> Option<mpu::Region> { loop { } }
 
-            if new_region.is_none() {
-                return None;
-            }
+    fn sbrk(&self, increment: isize) -> Result<*const u8, Error> { loop { } }
 
-            for region in self.mpu_regions.iter() {
-                if region.get().is_none() {
-                    region.set(new_region);
-                    return new_region;
-                }
-            }
-
-            None
-        })
-    }
-
-    fn sbrk(&self, increment: isize) -> Result<*const u8, Error> {
-        let new_break = unsafe { self.app_break.get().offset(increment) };
-        self.brk(new_break)
-    }
-
-    fn brk(&self, new_break: *const u8) -> Result<*const u8, Error> {
-        self.mpu_config
-            .map_or(Err(Error::KernelError), |mut config| {
-                if new_break < self.allow_high_water_mark.get() || new_break >= self.mem_end() {
-                    Err(Error::AddressOutOfBounds)
-                } else if new_break > self.kernel_memory_break.get() {
-                    Err(Error::OutOfMemory)
-                } else if let Err(_) = self.chip.mpu().update_app_memory_region(
-                    new_break,
-                    self.kernel_memory_break.get(),
-                    mpu::Permissions::ReadWriteOnly,
-                    &mut config,
-                ) {
-                    Err(Error::OutOfMemory)
-                } else {
-                    let old_break = self.app_break.get();
-                    self.app_break.set(new_break);
-                    self.chip.mpu().configure_mpu(&config);
-                    Ok(old_break)
-                }
-            })
-    }
+    fn brk(&self, new_break: *const u8) -> Result<*const u8, Error> { loop { } }
 
     fn allow(
         &self,
         buf_start_addr: *const u8,
         size: usize,
-    ) -> Result<Option<AppSlice<Shared, u8>>, ReturnCode> {
-        if buf_start_addr == ptr::null_mut() {
-            Ok(None)
-        } else if self.in_app_owned_memory(buf_start_addr, size) {
-            let buf_end_addr = buf_start_addr.wrapping_add(size);
-            let new_water_mark = max(self.allow_high_water_mark.get(), buf_end_addr);
-            self.allow_high_water_mark.set(new_water_mark);
-            Ok(Some(AppSlice::new(
-                buf_start_addr as *mut u8,
-                size,
-                self.appid(),
-            )))
-        } else {
-            Err(ReturnCode::EINVAL)
-        }
-    }
+    ) -> Result<Option<AppSlice<Shared, u8>>, ReturnCode> { loop { } }
 
-    unsafe fn alloc(&self, size: usize, align: usize) -> Option<&mut [u8]> {
-        self.mpu_config.and_then(|mut config| {
-            let new_break_unaligned = self.kernel_memory_break.get().offset(-(size as isize));
-            let alignment_mask = !(align - 1);
-            let new_break = (new_break_unaligned as usize & alignment_mask) as *const u8;
-            if new_break < self.app_break.get() {
-                None
-            } else if let Err(_) = self.chip.mpu().update_app_memory_region(
-                self.app_break.get(),
-                new_break,
-                mpu::Permissions::ReadWriteOnly,
-                &mut config,
-            ) {
-                None
-            } else {
-                self.kernel_memory_break.set(new_break);
-                Some(slice::from_raw_parts_mut(new_break as *mut u8, size))
-            }
-        })
-    }
+    unsafe fn alloc(&self, size: usize, align: usize) -> Option<&mut [u8]> { loop { } }
 
-    unsafe fn free(&self, _: *mut u8) {}
+    unsafe fn free(&self, _: *mut u8) { loop { } }
 
     #[allow(clippy::cast_ptr_alignment)]
-    unsafe fn grant_ptr(&self, grant_num: usize) -> *mut *mut u8 {
-        let grant_num = grant_num as isize;
-        (self.mem_end() as *mut *mut u8).offset(-(grant_num + 1))
-    }
+    unsafe fn grant_ptr(&self, grant_num: usize) -> *mut *mut u8 { loop { } }
 
-    fn get_process_name(&self) -> &'static str {
-        self.process_name
-    }
+    fn get_process_name(&self) -> &'static str { loop { } }
 
-    unsafe fn set_syscall_return_value(&self, return_value: isize) {
-        let mut stored_state = self.stored_state.get();
-        self.chip
-            .userspace_kernel_boundary()
-            .set_syscall_return_value(self.sp(), &mut stored_state, return_value);
-        self.stored_state.set(stored_state);
-    }
+    unsafe fn set_syscall_return_value(&self, return_value: isize) { loop { } }
 
-    unsafe fn set_process_function(&self, callback: FunctionCall) {
-        let remaining_stack_bytes = self.sp() as usize - self.memory.as_ptr() as usize;
+    unsafe fn set_process_function(&self, callback: FunctionCall) { loop { } }
 
-        let mut stored_state = self.stored_state.get();
+    unsafe fn switch_to(&self) -> Option<syscall::ContextSwitchReason> { loop { } }
 
-        match self.chip.userspace_kernel_boundary().set_process_function(
-            self.sp(),
-            remaining_stack_bytes,
-            &mut stored_state,
-            callback,
-        ) {
-            Ok(stack_bottom) => {
-                self.kernel.increment_work();
+    fn debug_syscall_count(&self) -> usize { loop { } }
 
-                self.state.set(State::Running);
+    fn debug_dropped_callback_count(&self) -> usize { loop { } }
 
-                self.current_stack_pointer.set(stack_bottom as *mut u8);
-                self.debug_set_max_stack_depth();
-            }
+    fn debug_restart_count(&self) -> usize { loop { } }
 
-            Err(bad_stack_bottom) => {
-                self.debug.map(|debug| {
-                    let bad_stack_bottom = bad_stack_bottom as *const u8;
-                    if bad_stack_bottom < debug.min_stack_pointer {
-                        debug.min_stack_pointer = bad_stack_bottom;
-                    }
-                });
-                self.set_fault_state();
-            }
-        }
-        self.stored_state.set(stored_state);
-    }
+    fn debug_timeslice_expiration_count(&self) -> usize { loop { } }
 
-    unsafe fn switch_to(&self) -> Option<syscall::ContextSwitchReason> {
-        let mut stored_state = self.stored_state.get();
-        let (stack_pointer, switch_reason) = self
-            .chip
-            .userspace_kernel_boundary()
-            .switch_to_process(self.sp(), &mut stored_state);
-        self.current_stack_pointer.set(stack_pointer as *const u8);
-        self.stored_state.set(stored_state);
+    fn debug_timeslice_expired(&self) { loop { } }
 
-        self.debug.map(|debug| {
-            if self.current_stack_pointer.get() < debug.min_stack_pointer {
-                debug.min_stack_pointer = self.current_stack_pointer.get();
-            }
-
-            if switch_reason == syscall::ContextSwitchReason::TimesliceExpired {
-                debug.timeslice_expiration_count += 1;
-            }
-        });
-
-        Some(switch_reason)
-    }
-
-    fn debug_syscall_count(&self) -> usize {
-        self.debug.map_or(0, |debug| debug.syscall_count)
-    }
-
-    fn debug_dropped_callback_count(&self) -> usize {
-        self.debug.map_or(0, |debug| debug.dropped_callback_count)
-    }
-
-    fn debug_restart_count(&self) -> usize {
-        self.debug.map_or(0, |debug| debug.restart_count)
-    }
-
-    fn debug_timeslice_expiration_count(&self) -> usize {
-        self.debug
-            .map_or(0, |debug| debug.timeslice_expiration_count)
-    }
-
-    fn debug_timeslice_expired(&self) {
-        self.debug
-            .map(|debug| debug.timeslice_expiration_count += 1);
-    }
-
-    unsafe fn fault_fmt(&self, writer: &mut dyn Write) {
-        self.chip.userspace_kernel_boundary().fault_fmt(writer);
-    }
+    unsafe fn fault_fmt(&self, writer: &mut dyn Write) { loop { } }
 
     unsafe fn process_detail_fmt(&self, writer: &mut dyn Write) {
         let flash_end = self.flash.as_ptr().add(self.flash.len()) as usize;
@@ -854,13 +528,7 @@ impl<C: Chip> ProcessType for Process<'a, C> {
     }
 }
 
-fn exceeded_check(size: usize, allocated: usize) -> &'static str {
-    if size > allocated {
-        " EXCEEDED!"
-    } else {
-        "          "
-    }
-}
+fn exceeded_check(size: usize, allocated: usize) -> &'static str { loop { } }
 
 impl<C: 'static + Chip> Process<'a, C> {
     #[allow(clippy::cast_ptr_alignment)]
@@ -1050,33 +718,12 @@ impl<C: 'static + Chip> Process<'a, C> {
     }
 
     #[allow(clippy::cast_ptr_alignment)]
-    fn sp(&self) -> *const usize {
-        self.current_stack_pointer.get() as *const usize
-    }
+    fn sp(&self) -> *const usize { loop { } }
 
-    fn in_app_owned_memory(&self, buf_start_addr: *const u8, size: usize) -> bool {
-        let buf_end_addr = buf_start_addr.wrapping_add(size);
-
-        buf_end_addr >= buf_start_addr
-            && buf_start_addr >= self.mem_start()
-            && buf_end_addr <= self.app_break.get()
-    }
+    fn in_app_owned_memory(&self, buf_start_addr: *const u8, size: usize) -> bool { loop { } }
 
     #[allow(clippy::cast_ptr_alignment)]
-    unsafe fn grant_ptrs_reset(&self) {
-        let grant_ptrs_num = self.kernel.get_grant_count_and_finalize();
-        for grant_num in 0..grant_ptrs_num {
-            let grant_num = grant_num as isize;
-            let ctr_ptr = (self.mem_end() as *mut *mut usize).offset(-(grant_num + 1));
-            write_volatile(ctr_ptr, ptr::null_mut());
-        }
-    }
+    unsafe fn grant_ptrs_reset(&self) { loop { } }
 
-    fn debug_set_max_stack_depth(&self) {
-        self.debug.map(|debug| {
-            if self.current_stack_pointer.get() < debug.min_stack_pointer {
-                debug.min_stack_pointer = self.current_stack_pointer.get();
-            }
-        });
-    }
+    fn debug_set_max_stack_depth(&self) { loop { } }
 }
