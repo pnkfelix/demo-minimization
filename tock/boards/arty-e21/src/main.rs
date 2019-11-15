@@ -2,19 +2,14 @@
 #![no_main]
 #![feature(const_fn, in_band_lifetimes)]
 
-use capsules::virtual_alarm::{MuxAlarm, VirtualMuxAlarm};
-use capsules::virtual_uart::{MuxUart, UartDevice};
+use capsules::virtual_alarm::{VirtualMuxAlarm};
 use kernel::capabilities;
-use kernel::common::ring_buffer::RingBuffer;
-use kernel::component::Component;
-use kernel::hil;
 use kernel::Platform;
-use kernel::{create_capability, debug, static_init};
+use kernel::{create_capability, static_init};
 
 mod timer_test {
 #![allow(dead_code)]
 
-use kernel::debug;
 use kernel::hil::time::{self, Alarm};
 
 pub struct TimerTest<'a, A: Alarm<'a>> {
@@ -35,37 +30,26 @@ impl<A: Alarm<'a>> time::AlarmClient for TimerTest<'a, A> {
 }
 
 pub mod io {
-use arty_e21;
 use core::fmt::Write;
 use core::panic::PanicInfo;
 use core::str;
-use kernel::debug;
-use kernel::hil::gpio;
-use kernel::hil::led;
-use rv32i;
-
-use crate::PROCESSES;
 
 struct Writer;
 
-static mut WRITER: Writer = Writer {};
-
 impl Write for Writer {
-    fn write_str(&mut self, s: &str) -> ::core::fmt::Result { loop { } }
+    fn write_str(&mut self, _: &str) -> ::core::fmt::Result { loop { } }
 }
 
 #[cfg(not(test))]
 #[no_mangle]
 #[panic_handler]
-    pub unsafe extern "C" fn panic_fmt(pi: &PanicInfo) -> ! { loop { } }
+    pub unsafe extern "C" fn panic_fmt(_: &PanicInfo) -> ! { loop { } }
 }
 
 const NUM_PROCS: usize = 4;
 
-const FAULT_RESPONSE: kernel::procs::FaultResponse = kernel::procs::FaultResponse::Panic;
-
-#[link_section = ".app_memory"]
-static mut APP_MEMORY: [u8; 8192] = [0; 8192];
+// #[link_section = ".app_memory"]
+// static mut APP_MEMORY: [u8; 8192] = [0; 8192];
 
 static mut PROCESSES: [Option<&'static dyn kernel::procs::ProcessType>; NUM_PROCS] =
     [None, None, None, None];
@@ -75,18 +59,18 @@ static mut PROCESSES: [Option<&'static dyn kernel::procs::ProcessType>; NUM_PROC
 pub static mut STACK_MEMORY: [u8; 0x1000] = [0; 0x1000];
 
 struct ArtyE21 {
-    console: &'static capsules::console::Console<'static>,
-    gpio: &'static capsules::gpio::GPIO<'static>,
-    alarm: &'static capsules::alarm::AlarmDriver<
+    _console: &'static capsules::console::Console<'static>,
+    _gpio: &'static capsules::gpio::GPIO<'static>,
+    _alarm: &'static capsules::alarm::AlarmDriver<
         'static,
         VirtualMuxAlarm<'static, rv32i::machine_timer::MachineTimer<'static>>,
     >,
-    led: &'static capsules::led::LED<'static>,
-    button: &'static capsules::button::Button<'static>,
+    _led: &'static capsules::led::LED<'static>,
+    _button: &'static capsules::button::Button<'static>,
 }
 
 impl Platform for ArtyE21 {
-    fn with_driver<F, R>(&self, driver_num: usize, f: F) -> R
+    fn with_driver<F, R>(&self, _: usize, _: F) -> R
     where
         F: FnOnce(Option<&dyn kernel::Driver>) -> R,
     { loop { } }
