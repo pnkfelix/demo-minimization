@@ -44,7 +44,10 @@ pub struct ArtyExx {
 
 impl ArtyExx {
     pub unsafe fn new() -> ArtyExx { loop { } }
+}
 
+#[cfg(not_now)]
+impl ArtyExx {
     pub fn enable_all_interrupts(&self) { loop { } }
 
     pub unsafe fn disable_pmp(&self) { loop { } }
@@ -99,12 +102,14 @@ pub struct Port {
     pins: [GpioPin; 16],
 }
 
+#[cfg(not_now)]
 impl Index<usize> for Port {
     type Output = GpioPin;
 
     fn index(&self, index: usize) -> &GpioPin { loop { } }
 }
 
+#[cfg(not_now)]
 impl IndexMut<usize> for Port {
     fn index_mut(&mut self, index: usize) -> &mut GpioPin { loop { } }
 }
