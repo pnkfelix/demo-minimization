@@ -26,18 +26,11 @@ impl<A: Alarm<'a>> TimerTest<'a, A> {
         TimerTest { alarm: alarm }
     }
 
-    pub fn start(&self) {
-        debug!("starting");
-        let start = self.alarm.now();
-        let exp = start + 99999;
-        self.alarm.set_alarm(exp);
-    }
+    pub fn start(&self) { loop { } }
 }
 
 impl<A: Alarm<'a>> time::AlarmClient for TimerTest<'a, A> {
-    fn fired(&self) {
-        debug!("timer!!");
-    }
+    fn fired(&self) { loop { } }
 }
 }
 
@@ -58,28 +51,13 @@ struct Writer;
 static mut WRITER: Writer = Writer {};
 
 impl Write for Writer {
-    fn write_str(&mut self, s: &str) -> ::core::fmt::Result {
-        debug!("{}", s);
-        Ok(())
-    }
+    fn write_str(&mut self, s: &str) -> ::core::fmt::Result { loop { } }
 }
 
 #[cfg(not(test))]
 #[no_mangle]
 #[panic_handler]
-pub unsafe extern "C" fn panic_fmt(pi: &PanicInfo) -> ! {
-    let led_green = &arty_e21::gpio::PORT[19];
-    gpio::Pin::make_output(led_green);
-    gpio::Pin::set(led_green);
-
-    let led_blue = &arty_e21::gpio::PORT[21];
-    gpio::Pin::make_output(led_blue);
-    gpio::Pin::set(led_blue);
-
-    let led_red = &mut led::LedLow::new(&mut arty_e21::gpio::PORT[22]);
-    let writer = &mut WRITER;
-    debug::panic(&mut [led_red], writer, pi, &rv32i::support::nop, &PROCESSES)
-}
+    pub unsafe extern "C" fn panic_fmt(pi: &PanicInfo) -> ! { loop { } }
 }
 
 const NUM_PROCS: usize = 4;
@@ -111,18 +89,7 @@ impl Platform for ArtyE21 {
     fn with_driver<F, R>(&self, driver_num: usize, f: F) -> R
     where
         F: FnOnce(Option<&dyn kernel::Driver>) -> R,
-    {
-        match driver_num {
-            capsules::console::DRIVER_NUM => f(Some(self.console)),
-            capsules::gpio::DRIVER_NUM => f(Some(self.gpio)),
-
-            capsules::alarm::DRIVER_NUM => f(Some(self.alarm)),
-            capsules::led::DRIVER_NUM => f(Some(self.led)),
-            capsules::button::DRIVER_NUM => f(Some(self.button)),
-
-            _ => f(None),
-        }
-    }
+    { loop { } }
 }
 
 #[no_mangle]
