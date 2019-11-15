@@ -25,23 +25,6 @@ impl kernel::Chip for ArtyExx {
     type MPU = ();
     type UserspaceKernelBoundary = rv32i::syscall::SysCall;
     type SysTick = ();
-
-    fn mpu(&self) -> &Self::MPU { loop { } }
-
-    fn systick(&self) -> &Self::SysTick { loop { } }
-
-    fn userspace_kernel_boundary(&self) -> &rv32i::syscall::SysCall { loop { } }
-
-    fn service_pending_interrupts(&self) { loop { } }
-
-    fn has_pending_interrupts(&self) -> bool { loop { } }
-
-    fn sleep(&self) { loop { } }
-
-    unsafe fn atomic<F, R>(&self, _: F) -> R
-    where
-        F: FnOnce() -> R,
-    { loop { } }
 }
 
 #[export_name = "_start_trap_rust"]
