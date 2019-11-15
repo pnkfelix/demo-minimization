@@ -9,5 +9,5 @@
 mod interrupts;
 
 pub mod chip;
-pub mod gpio;
-pub mod uart;
+mod gpio;
+mod uart;
