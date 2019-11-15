@@ -1,5 +1,3 @@
-//! Drivers and chip support for the E21 soft core.
-
 #![feature(asm, concat_idents, const_fn)]
 #![feature(exclusive_range_pattern)]
 #![no_std]
@@ -8,8 +6,6 @@
 
 #[cfg(not_now)]
 mod interrupts {
-//! Named interrupts for the E21 Arty core.
-
 #![allow(dead_code)]
 
 pub const MTIP: u32 = 7; // Machine Timer
@@ -39,10 +35,6 @@ use kernel::debug;
 use rv32i;
 use rv32i::machine_timer;
 
-// use crate::gpio;
-// use crate::interrupts;
-// use crate::uart;
-
 extern "C" {
     fn _start_trap();
 }
@@ -57,40 +49,16 @@ impl ArtyExx {
 
     pub fn enable_all_interrupts(&self) { loop { } }
 
-    /// Configure the PMP to allow all accesses in both machine mode (the
-    /// default) and in user mode.
-    ///
-    /// This needs to be replaced with a real PMP driver. See
-    /// https://github.com/tock/tock/issues/1135
     pub unsafe fn disable_pmp(&self) { loop { } }
 
-    /// By default the machine timer is enabled and will trigger interrupts. To
-    /// prevent that we can make the compare register very large to effectively
-    /// stop the interrupt from triggering, and then the machine timer can be
-    /// used later as needed.
     pub unsafe fn disable_machine_timer(&self) { loop { } }
 
-    /// Setup the function that should run when a trap happens.
-    ///
-    /// This needs to be chip specific because how the CLIC works is configured
-    /// when the trap handler address is specified in mtvec, and that is only
-    /// valid for platforms with a CLIC.
     pub unsafe fn configure_trap_handler(&self) { loop { } }
 
-    /// Generic helper initialize function to setup all of the chip specific
-    /// operations. Different boards can call the functions that `initialize()`
-    /// calls directly if it needs to use a custom setup operation.
     pub unsafe fn initialize(&self) { loop { } }
 }
 
 impl kernel::Chip for ArtyExx {
-    // While there is initial support for a PMP driver (as of 2019-10-04), it is not
-    // complete, and while it should disable the PMP, it seems to cause some negative
-    // side effects (context switching does not work correctly) on the Arty-E21 platform.
-    //
-    // TODO: implement the PMP driver and add it here `type MPU = rv32i::pmp::PMPConfig;`.
-    //
-    // See https://github.com/tock/tock/pull/1382 for (a little) more information.
     type MPU = ();
     type UserspaceKernelBoundary = rv32i::syscall::SysCall;
     type SysTick = ();
@@ -113,17 +81,9 @@ impl kernel::Chip for ArtyExx {
     { loop { } }
 }
 
-/// Trap handler for board/chip specific code.
-///
-/// For the arty-e21 this gets called when an interrupt occurs while the chip is
-/// in kernel mode. All we need to do is check which interrupt occurred and
-/// disable it.
 #[export_name = "_start_trap_rust"]
     pub extern "C" fn start_trap_rust() { loop { } }
 
-/// Function that gets called if an interrupt occurs while an app was running.
-/// mcause is passed in, and this function should correctly handle disabling the
-/// interrupt that fired so that it does not trigger again.
 #[export_name = "_disable_interrupt_trap_handler"]
     pub extern "C" fn disable_interrupt_trap_handler(mcause: u32) { loop { } }
 }
