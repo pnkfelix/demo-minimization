@@ -98,17 +98,13 @@ pub unsafe fn reset_handler() {
     let process_mgmt_cap = create_capability!(capabilities::ProcessManagementCapability);
     let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
 
-    extern "C" {
-        static _sapps: u8;
-    }
-
     kernel::procs::load_processes(
         board_kernel,
         chip,
-        &_sapps as *const u8,
-        &mut APP_MEMORY,
+        &0u8 as *const u8,
+        &mut [0; 8192], // APP_MEMORY,
         &mut PROCESSES,
-        FAULT_RESPONSE,
+        kernel::procs::FaultResponse::Panic,
         &process_mgmt_cap,
     );
 
