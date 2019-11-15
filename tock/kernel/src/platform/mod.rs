@@ -17,27 +17,27 @@ pub trait Chip {
 
     type SysTick: systick::SysTick;
 
-    fn service_pending_interrupts(&self);
+    fn service_pending_interrupts(&self){ loop { } }
 
-    fn has_pending_interrupts(&self) -> bool;
+    fn has_pending_interrupts(&self) -> bool{ loop { } }
 
-    fn mpu(&self) -> &Self::MPU;
+    fn mpu(&self) -> &Self::MPU{ loop { } }
 
-    fn systick(&self) -> &Self::SysTick;
+    fn systick(&self) -> &Self::SysTick{ loop { } }
 
-    fn userspace_kernel_boundary(&self) -> &Self::UserspaceKernelBoundary;
+    fn userspace_kernel_boundary(&self) -> &Self::UserspaceKernelBoundary{ loop { } }
 
-    fn sleep(&self);
+    fn sleep(&self){ loop { } }
 
-    unsafe fn atomic<F, R>(&self, f: F) -> R
+    unsafe fn atomic<F, R>(&self, _: F) -> R
     where
-        F: FnOnce() -> R;
+        F: FnOnce() -> R{ loop { } }
 }
 
 pub trait ClockInterface {
-    fn is_enabled(&self) -> bool;
-    fn enable(&self);
-    fn disable(&self);
+    fn is_enabled(&self) -> bool{ loop { } }
+    fn enable(&self){ loop { } }
+    fn disable(&self){ loop { } }
 }
 
 pub struct NoClockControl {}
