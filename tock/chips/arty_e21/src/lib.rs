@@ -6,6 +6,7 @@
 #![crate_name = "arty_e21"]
 #![crate_type = "rlib"]
 
+#[cfg(not_now)]
 mod interrupts {
 //! Named interrupts for the E21 Arty core.
 
@@ -38,9 +39,9 @@ use kernel::debug;
 use rv32i;
 use rv32i::machine_timer;
 
-use crate::gpio;
-use crate::interrupts;
-use crate::uart;
+// use crate::gpio;
+// use crate::interrupts;
+// use crate::uart;
 
 extern "C" {
     fn _start_trap();
@@ -126,6 +127,7 @@ impl kernel::Chip for ArtyExx {
 #[export_name = "_disable_interrupt_trap_handler"]
     pub extern "C" fn disable_interrupt_trap_handler(mcause: u32) { loop { } }
 }
+#[cfg(not_now)]
 mod gpio {
 use core::ops::{Index, IndexMut};
 
@@ -200,6 +202,7 @@ pub static mut PORT: Port = Port {
     ],
 };
 }
+#[cfg(not_now)]
 mod uart {
 use kernel::common::StaticRef;
 use sifive::uart::{Uart, UartRegisters};
