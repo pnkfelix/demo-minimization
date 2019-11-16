@@ -2564,10 +2564,9 @@ use core::{mem, ptr, slice, str};
 
 use crate::callback::{AppId, CallbackId};
 use crate::capabilities::ProcessManagementCapability;
-fn mapcell_map<T, F, R>(closure: F) -> Option<R> where F: FnOnce(&mut T) -> R
+fn mapcell_map<T, F>(closure: F) where F: FnOnce(&mut T)
 {
     closure(None::<&mut T>.unwrap());
-    loop { }
 }
 
 use crate::common::{Queue, RingBuffer};
