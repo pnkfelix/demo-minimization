@@ -2575,12 +2575,12 @@ use crate::tbfheader;
 use core::cmp::max;
 
 pub fn load_processes<C: Chip>(
-    kernel: &'static Kernel,
+    _: impl Sized,
     chip: &'static C,
     _: impl Sized,
     _: impl Sized,
     _: impl Sized,
-    fault_response: FaultResponse,
+    _: impl Sized,
     _: impl Sized,
 ) {
         unsafe {
