@@ -2583,16 +2583,13 @@ pub fn load_processes<C: Chip>(
     fault_response: FaultResponse,
     _capability: &dyn ProcessManagementCapability,
 ) {
-    let mut apps_in_flash_ptr = start_of_flash;
-    let mut app_memory_ptr = app_memory.as_mut_ptr();
-    let mut app_memory_size = app_memory.len();
         unsafe {
             Process::create(
                 kernel,
                 chip,
-                apps_in_flash_ptr,
-                app_memory_ptr,
-                app_memory_size,
+                start_of_flash,
+                app_memory.as_mut_ptr(),
+                app_memory.len(),
                 fault_response,
                 0,
             );
