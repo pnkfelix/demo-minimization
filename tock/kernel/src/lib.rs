@@ -2693,7 +2693,9 @@ impl<C: 'static + Chip> Process<'a, C> {
 
             process
     }
+}
 
+impl<C: 'static + Chip> Process<'a, C> {
     #[allow(clippy::cast_ptr_alignment)]
     fn sp(&self) -> *const usize { loop { } }
 
