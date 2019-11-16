@@ -3073,131 +3073,13 @@ impl<C: 'static + Chip> Process<'a, C> {
         fault_response: FaultResponse,
         index: usize,
     ) -> (Option<&'static dyn ProcessType>, usize, usize) {
-        if let Some(tbf_header) = tbfheader::parse_and_validate_tbf_header(app_flash_address) {
-            let app_flash_size = tbf_header.get_total_size() as usize;
-
-            if !tbf_header.is_app() || !tbf_header.enabled() {
-                return (None, app_flash_size, 0);
-            }
-
-            let mut min_app_ram_size = tbf_header.get_minimum_app_ram_size() as usize;
-            let process_name = tbf_header.get_package_name();
-            let init_fn =
-                app_flash_address.offset(tbf_header.get_init_function_offset() as isize) as usize;
-
-            let mut mpu_config: <<C as Chip>::MPU as MPU>::MpuConfig = Default::default();
-
-            if let None = chip.mpu().allocate_region(
-                app_flash_address,
-                app_flash_size,
-                app_flash_size,
-                mpu::Permissions::ReadExecuteOnly,
-                &mut mpu_config,
-            ) {
-                return (None, app_flash_size, 0);
-            }
-
-            let grant_ptr_size = mem::size_of::<*const usize>();
-            let grant_ptrs_num = kernel.get_grant_count_and_finalize();
-            let grant_ptrs_offset = grant_ptrs_num * grant_ptr_size;
-
-            let callback_size = mem::size_of::<Task>();
-            let callback_len = 10;
-            let callbacks_offset = callback_len * callback_size;
-
-            let process_struct_offset = mem::size_of::<Process<C>>();
-
-            let initial_kernel_memory_size =
-                grant_ptrs_offset + callbacks_offset + process_struct_offset;
-            let initial_app_memory_size = 3 * 1024;
-
-            if min_app_ram_size < initial_app_memory_size {
-                min_app_ram_size = initial_app_memory_size;
-            }
-
-            let min_total_memory_size = min_app_ram_size + initial_kernel_memory_size;
-
-            let (memory_start, memory_size) = match chip.mpu().allocate_app_memory_region(
-                remaining_app_memory as *const u8,
-                remaining_app_memory_size,
-                min_total_memory_size,
-                initial_app_memory_size,
-                initial_kernel_memory_size,
-                mpu::Permissions::ReadWriteOnly,
-                &mut mpu_config,
-            ) {
-                Some((memory_start, memory_size)) => (memory_start, memory_size),
-                None => {
-                    return (None, app_flash_size, 0);
-                }
-            };
-
-            let memory_padding_size = (memory_start as usize) - (remaining_app_memory as usize);
-
-            let app_memory = slice::from_raw_parts_mut(memory_start as *mut u8, memory_size);
-
-            let initial_stack_pointer = memory_start.add(initial_app_memory_size);
-            let initial_sbrk_pointer = memory_start.add(initial_app_memory_size);
-
-            let mut kernel_memory_break = app_memory.as_mut_ptr().add(app_memory.len());
-
-            kernel_memory_break = kernel_memory_break.offset(-(grant_ptrs_offset as isize));
-
-            let opts =
-                slice::from_raw_parts_mut(kernel_memory_break as *mut *const usize, grant_ptrs_num);
-            for opt in opts.iter_mut() {
-                *opt = ptr::null()
-            }
-
-            kernel_memory_break = kernel_memory_break.offset(-(callbacks_offset as isize));
-
-            let callback_buf =
-                slice::from_raw_parts_mut(kernel_memory_break as *mut Task, callback_len);
-            let tasks = RingBuffer::new(callback_buf);
-
-            kernel_memory_break = kernel_memory_break.offset(-(process_struct_offset as isize));
-            let process_struct_memory_location = kernel_memory_break;
-
-            let app_heap_start_pointer = None;
-            let app_stack_start_pointer = None;
-
             let mut process: &mut Process<C> =
-                &mut *(process_struct_memory_location as *mut Process<'static, C>);
-
-            process.app_idx = index;
-            process.kernel = kernel;
-            process.chip = chip;
-            process.memory = app_memory;
-            process.header = tbf_header;
-            process.kernel_memory_break = Cell::new(kernel_memory_break);
-            process.original_kernel_memory_break = kernel_memory_break;
-            process.app_break = Cell::new(initial_sbrk_pointer);
-            process.original_app_break = initial_sbrk_pointer;
-            process.allow_high_water_mark = Cell::new(remaining_app_memory);
-            process.current_stack_pointer = Cell::new(initial_stack_pointer);
-            process.original_stack_pointer = initial_stack_pointer;
-
-            process.flash = slice::from_raw_parts(app_flash_address, app_flash_size);
-
-            process.state = Cell::new(State::Unstarted);
-            process.fault_response = fault_response;
-
-            process.mpu_config = MapCell::new(mpu_config);
-            process.mpu_regions = [
-                Cell::new(None),
-                Cell::new(None),
-                Cell::new(None),
-                Cell::new(None),
-                Cell::new(None),
-                Cell::new(None),
-            ];
-            process.tasks = MapCell::new(tasks);
-            process.process_name = process_name;
+                &mut *((&mut []).as_mut_ptr() as *mut Process<'static, C>);
 
             process.debug = MapCell::new(ProcessDebug {
-                app_heap_start_pointer: app_heap_start_pointer,
-                app_stack_start_pointer: app_stack_start_pointer,
-                min_stack_pointer: initial_stack_pointer,
+                app_heap_start_pointer: None,
+                app_stack_start_pointer: None,
+                min_stack_pointer: 0 as *const u8,
                 syscall_count: 0,
                 last_syscall: None,
                 dropped_callback_count: 0,
@@ -3205,29 +3087,11 @@ impl<C: 'static + Chip> Process<'a, C> {
                 timeslice_expiration_count: 0,
             });
 
-            let flash_protected_size = process.header.get_protected_size() as usize;
-            let flash_app_start = app_flash_address as usize + flash_protected_size;
-
-            process.tasks.map(|tasks| {
-                tasks.enqueue(Task::FunctionCall(FunctionCall {
-                    source: FunctionCallSource::Kernel,
-                    pc: init_fn,
-                    argument0: flash_app_start,
-                    argument1: process.memory.as_ptr() as usize,
-                    argument2: process.memory.len() as usize,
-                    argument3: process.app_break.get() as usize,
-                }));
-            });
-
-            kernel.increment_work();
-
             return (
                 Some(process),
-                app_flash_size,
-                memory_padding_size + memory_size,
+                0usize,
+                0usize,
             );
-        }
-        (None, 0, 0)
     }
 
     #[allow(clippy::cast_ptr_alignment)]
