@@ -2569,23 +2569,12 @@ struct MapCell<T> {
     occupied: Cell<bool>,
 }
 impl<T> MapCell<T> {
-    pub fn is_some(&self) -> bool {
-        self.occupied.get()
-    }
     pub fn map<F, R>(&self, closure: F) -> Option<R>
     where
         F: FnOnce(&mut T) -> R,
     {
-        if self.is_some() {
-            self.occupied.set(false);
-            let valref = unsafe { &mut *self.val.get() };
-            // TODO: change to valref.get_mut() once stabilized [#53491](https://github.com/rust-lang/rust/issues/53491)
-            let res = closure(unsafe { &mut *valref.as_mut_ptr() });
-            self.occupied.set(true);
-            Some(res)
-        } else {
-            None
-        }
+            closure(None::<&mut T>.unwrap());
+            loop { }
     }
 }
 use crate::common::{Queue, RingBuffer};
