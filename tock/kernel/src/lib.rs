@@ -2564,7 +2564,30 @@ use core::{mem, ptr, slice, str};
 
 use crate::callback::{AppId, CallbackId};
 use crate::capabilities::ProcessManagementCapability;
-use crate::common::cells::MapCell;
+struct MapCell<T> {
+    val: core::cell::UnsafeCell<core::mem::MaybeUninit<T>>,
+    occupied: Cell<bool>,
+}
+impl<T> MapCell<T> {
+    pub fn is_some(&self) -> bool {
+        self.occupied.get()
+    }
+    pub fn map<F, R>(&self, closure: F) -> Option<R>
+    where
+        F: FnOnce(&mut T) -> R,
+    {
+        if self.is_some() {
+            self.occupied.set(false);
+            let valref = unsafe { &mut *self.val.get() };
+            // TODO: change to valref.get_mut() once stabilized [#53491](https://github.com/rust-lang/rust/issues/53491)
+            let res = closure(unsafe { &mut *valref.as_mut_ptr() });
+            self.occupied.set(true);
+            Some(res)
+        } else {
+            None
+        }
+    }
+}
 use crate::common::{Queue, RingBuffer};
 use crate::mem::{AppSlice, Shared};
 use crate::platform::mpu::{self, MPU};
