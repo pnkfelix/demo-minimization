@@ -2564,20 +2564,6 @@ use core::{mem, ptr, slice, str};
 
 use crate::callback::{AppId, CallbackId};
 use crate::capabilities::ProcessManagementCapability;
-struct MapCell<T> {
-    val: core::cell::UnsafeCell<core::mem::MaybeUninit<T>>,
-    occupied: Cell<bool>,
-}
-impl<T> MapCell<T> {
-    pub fn map<F, R>(&self, closure: F) -> Option<R>
-    where
-        F: FnOnce(&mut T) -> R,
-    {
-            closure(None::<&mut T>.unwrap());
-            loop { }
-    }
-}
-
 fn mapcell_map<T, F, R>(closure: F) -> Option<R> where F: FnOnce(&mut T) -> R
 {
     closure(None::<&mut T>.unwrap());
