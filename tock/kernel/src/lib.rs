@@ -3076,17 +3076,6 @@ impl<C: 'static + Chip> Process<'a, C> {
             let mut process: &mut Process<C> =
                 &mut *((&mut []).as_mut_ptr() as *mut Process<'static, C>);
 
-            process.debug = MapCell::new(ProcessDebug {
-                app_heap_start_pointer: None,
-                app_stack_start_pointer: None,
-                min_stack_pointer: 0 as *const u8,
-                syscall_count: 0,
-                last_syscall: None,
-                dropped_callback_count: 0,
-                restart_count: 0,
-                timeslice_expiration_count: 0,
-            });
-
             return (
                 Some(process),
                 0usize,
