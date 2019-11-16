@@ -2577,11 +2577,11 @@ use core::cmp::max;
 pub fn load_processes<C: Chip>(
     kernel: &'static Kernel,
     chip: &'static C,
-    start_of_flash: *const u8,
-    app_memory: &mut [u8],
-    procs: &'static mut [Option<&'static dyn ProcessType>],
+    _: impl Sized,
+    _: impl Sized,
+    _: impl Sized,
     fault_response: FaultResponse,
-    _capability: &dyn ProcessManagementCapability,
+    _: impl Sized,
 ) {
         unsafe {
             Process::create(
