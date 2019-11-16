@@ -3179,7 +3179,6 @@ impl<C: 'static + Chip> Process<'a, C> {
 
             process.flash = slice::from_raw_parts(app_flash_address, app_flash_size);
 
-            // process.stored_state = Cell::new(Default::default());
             process.state = Cell::new(State::Unstarted);
             process.fault_response = fault_response;
 
@@ -3219,26 +3218,6 @@ impl<C: 'static + Chip> Process<'a, C> {
                     argument3: process.app_break.get() as usize,
                 }));
             });
-
-            /*
-            let mut stored_state = process.stored_state.get();
-            match chip.userspace_kernel_boundary().initialize_new_process(
-                process.sp(),
-                process.sp() as usize - process.memory.as_ptr() as usize,
-                &mut stored_state,
-            ) {
-                Ok(new_stack_pointer) => {
-                    process
-                        .current_stack_pointer
-                        .set(new_stack_pointer as *mut u8);
-                    process.debug_set_max_stack_depth();
-                    process.stored_state.set(stored_state);
-                }
-                Err(_) => {
-                    return (None, app_flash_size, 0);
-                }
-            };
-             */
 
             kernel.increment_work();
 
