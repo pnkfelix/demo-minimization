@@ -2587,9 +2587,9 @@ pub fn load_processes<C: Chip>(
             Process::create(
                 kernel,
                 chip,
-                start_of_flash,
-                app_memory.as_mut_ptr(),
-                app_memory.len(),
+                0 as *const u8,
+                (&mut []).as_mut_ptr(),
+                0,
                 fault_response,
                 0,
             );
