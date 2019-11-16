@@ -3045,15 +3045,11 @@ impl<C: 'static + Chip> Process<'a, C> {
     #[allow(clippy::cast_ptr_alignment)]
     crate unsafe fn create(
         chip: &'static C,
-    ) -> (Option<&'static dyn ProcessType>, usize, usize) {
+    ) -> &'static dyn ProcessType {
             let mut process: &mut Process<C> =
                 &mut *((&mut []).as_mut_ptr() as *mut Process<'static, C>);
 
-            return (
-                Some(process),
-                0usize,
-                0usize,
-            );
+            process
     }
 
     #[allow(clippy::cast_ptr_alignment)]
