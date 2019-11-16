@@ -6,7 +6,6 @@
 
 pub mod chip {
 use kernel;
-use rv32i;
 
 extern "C" {
     fn _start_trap();
@@ -21,7 +20,7 @@ impl ArtyExx {
 
 impl kernel::Chip for ArtyExx {
     type MPU = ();
-    type UserspaceKernelBoundary = rv32i::syscall::SysCall;
+    type UserspaceKernelBoundary = ();
     type SysTick = ();
 }
 
