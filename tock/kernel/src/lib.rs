@@ -2577,6 +2577,13 @@ impl<T> MapCell<T> {
             loop { }
     }
 }
+
+fn mapcell_map<T, F, R>(closure: F) -> Option<R> where F: FnOnce(&mut T) -> R
+{
+    closure(None::<&mut T>.unwrap());
+    loop { }
+}
+
 use crate::common::{Queue, RingBuffer};
 use crate::mem::{AppSlice, Shared};
 use crate::platform::mpu::{self, MPU};
@@ -2719,7 +2726,7 @@ pub struct Process<'a, C: 'static + Chip> {
 
 impl<C: Chip> ProcessType for Process<'a, C> {
     unsafe fn process_detail_fmt(&self, writer: &mut dyn Write) {
-        self.mpu_config.map(|config| {
+        mapcell_map(|config: &mut <<C as Chip>::MPU as MPU>::MpuConfig| {
             let _ = writer.write_fmt(format_args!("{}", config));
         });
     }
