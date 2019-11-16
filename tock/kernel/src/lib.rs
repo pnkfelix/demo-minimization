@@ -2585,12 +2585,12 @@ pub fn load_processes<C: Chip>(
 ) {
         unsafe {
             Process::create(
-                kernel,
+                (),
                 chip,
-                0 as *const u8,
+                (),
                 (&mut []).as_mut_ptr(),
                 0,
-                fault_response,
+                (),
                 0,
             );
         }
