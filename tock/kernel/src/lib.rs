@@ -2574,22 +2574,7 @@ use crate::syscall::{self, Syscall, UserspaceKernelBoundary};
 use crate::tbfheader;
 use core::cmp::max;
 
-pub fn load_processes<C: Chip>(
-    _: impl Sized,
-    chip: &'static C,
-    _: impl Sized,
-    _: impl Sized,
-    _: impl Sized,
-    _: impl Sized,
-    _: impl Sized,
-) {
-        unsafe {
-            Process::create(
-                chip,
-            );
-        }
-}
-
+pub fn load_processes<C: Chip>(chip: &'static C) { unsafe { Process::create(chip); } }
 
 pub trait ProcessType {
     fn appid(&self) -> AppId { loop { } }

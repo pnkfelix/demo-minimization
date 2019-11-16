@@ -42,13 +42,7 @@ pub unsafe fn reset_handler() {
     let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
 
     kernel::procs::load_processes(
-        board_kernel,
         chip,
-        (),
-        (),
-        (),
-        kernel::procs::FaultResponse::Panic,
-        (),
     );
 
 }
