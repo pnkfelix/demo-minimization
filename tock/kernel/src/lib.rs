@@ -3046,8 +3046,7 @@ impl<C: 'static + Chip> Process<'a, C> {
     crate unsafe fn create(
         chip: &'static C,
     ) -> &'static dyn ProcessType {
-            let mut process: &mut Process<C> =
-                &mut *((&mut []).as_mut_ptr() as *mut Process<'static, C>);
+            let mut process: &mut Process<C> = None.unwrap();
 
             process
     }
