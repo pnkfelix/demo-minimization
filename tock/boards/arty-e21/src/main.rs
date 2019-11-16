@@ -39,17 +39,16 @@ impl Platform for ArtyE21 {
 #[no_mangle]
 pub unsafe fn reset_handler() {
     let chip = static_init!(arty_e21::chip::ArtyExx, arty_e21::chip::ArtyExx::new());
-    let process_mgmt_cap = create_capability!(capabilities::ProcessManagementCapability);
     let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
 
     kernel::procs::load_processes(
         board_kernel,
         chip,
-        &0u8 as *const u8,
-        &mut [0; 8192], // APP_MEMORY,
-        &mut PROCESSES,
+        (),
+        (),
+        (),
         kernel::procs::FaultResponse::Panic,
-        &process_mgmt_cap,
+        (),
     );
 
 }
