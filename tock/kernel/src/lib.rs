@@ -2685,43 +2685,8 @@ struct ProcessDebug {
 }
 
 pub struct Process<'a, C: 'static + Chip> {
-    app_idx: usize,
-
-    kernel: &'static Kernel,
-
     chip: &'static C,
-
-    memory: &'static mut [u8],
-
-    kernel_memory_break: Cell<*const u8>,
-
-    original_kernel_memory_break: *const u8,
-
-    app_break: Cell<*const u8>,
-    original_app_break: *const u8,
-
-    allow_high_water_mark: Cell<*const u8>,
-
-    current_stack_pointer: Cell<*const u8>,
-    original_stack_pointer: *const u8,
-
-    flash: &'static [u8],
-
-    header: tbfheader::TbfHeader,
-
-    state: Cell<State>,
-
-    fault_response: FaultResponse,
-
-    mpu_config: MapCell<<<C as Chip>::MPU as MPU>::MpuConfig>,
-
-    mpu_regions: [Cell<Option<mpu::Region>>; 6],
-
-    tasks: MapCell<RingBuffer<'a, Task>>,
-
-    process_name: &'static str,
-
-    debug: MapCell<ProcessDebug>,
+    tasks: &'a (),
 }
 
 impl<C: Chip> ProcessType for Process<'a, C> {
