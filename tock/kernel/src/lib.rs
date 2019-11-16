@@ -2586,31 +2586,17 @@ pub fn load_processes<C: Chip>(
     let mut apps_in_flash_ptr = start_of_flash;
     let mut app_memory_ptr = app_memory.as_mut_ptr();
     let mut app_memory_size = app_memory.len();
-    for i in 0..procs.len() {
         unsafe {
-            let (process, flash_offset, memory_offset) = Process::create(
+            Process::create(
                 kernel,
                 chip,
                 apps_in_flash_ptr,
                 app_memory_ptr,
                 app_memory_size,
                 fault_response,
-                i,
+                0,
             );
-
-            if process.is_none() {
-                if flash_offset == 0 && memory_offset == 0 {
-                    break;
-                }
-            } else {
-                procs[i] = process;
-            }
-
-            apps_in_flash_ptr = apps_in_flash_ptr.add(flash_offset);
-            app_memory_ptr = app_memory_ptr.add(memory_offset);
-            app_memory_size -= memory_offset;
         }
-    }
 }
 
 
