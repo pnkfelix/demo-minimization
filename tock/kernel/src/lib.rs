@@ -3065,13 +3065,13 @@ fn exceeded_check(size: usize, allocated: usize) -> &'static str { loop { } }
 impl<C: 'static + Chip> Process<'a, C> {
     #[allow(clippy::cast_ptr_alignment)]
     crate unsafe fn create(
-        kernel: &'static Kernel,
+        kernel: impl Sized,
         chip: &'static C,
-        app_flash_address: *const u8,
+        app_flash_address: impl Sized,
         remaining_app_memory: *mut u8,
-        remaining_app_memory_size: usize,
-        fault_response: FaultResponse,
-        index: usize,
+        remaining_app_memory_size: impl Sized,
+        fault_response: impl Sized,
+        index: impl Sized,
     ) -> (Option<&'static dyn ProcessType>, usize, usize) {
             let mut process: &mut Process<C> =
                 &mut *((&mut []).as_mut_ptr() as *mut Process<'static, C>);
