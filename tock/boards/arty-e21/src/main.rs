@@ -15,14 +15,6 @@ use core::panic::PanicInfo;
     pub unsafe extern "C" fn panic_fmt(_: &PanicInfo) -> ! { loop { } }
 }
 
-const NUM_PROCS: usize = 4;
-
-// #[link_section = ".app_memory"]
-// static mut APP_MEMORY: [u8; 8192] = [0; 8192];
-
-static mut PROCESSES: [Option<&'static dyn kernel::procs::ProcessType>; NUM_PROCS] =
-    [None, None, None, None];
-
 #[no_mangle]
 #[link_section = ".stack_buffer"]
 pub static mut STACK_MEMORY: [u8; 0x1000] = [0; 0x1000];
