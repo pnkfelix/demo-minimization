@@ -1,10 +1,5 @@
 #![no_std]
 #![no_main]
-#![feature(const_fn, in_band_lifetimes)]
-
-use kernel::capabilities;
-use kernel::Platform;
-use kernel::{create_capability, static_init};
 
 pub mod io {
 use core::panic::PanicInfo;
