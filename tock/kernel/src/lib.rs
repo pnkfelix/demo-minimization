@@ -2579,7 +2579,7 @@ use crate::syscall::{self, Syscall, UserspaceKernelBoundary};
 use crate::tbfheader;
 use core::cmp::max;
 
-pub fn load_processes<C: Chip>(_: &'static C) { unsafe { process_create::<C>(); } }
+pub fn load_processes<C: Chip>(_: &'static C) { process_create::<C>(); }
 
 pub trait ProcessType {
     unsafe fn process_detail_fmt(&self, writer: &mut dyn Write) { loop { } }
