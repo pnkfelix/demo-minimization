@@ -1,14 +1,13 @@
 #![no_std]
 #![no_main]
 
-pub mod io {
 use core::panic::PanicInfo;
 
 #[cfg(not(test))]
 #[no_mangle]
 #[panic_handler]
-    pub unsafe extern "C" fn panic_fmt(_: &PanicInfo) -> ! { loop { } }
-}
+pub unsafe extern "C" fn panic_fmt(_: &PanicInfo) -> ! { loop { } }
+
 
 #[no_mangle]
 #[link_section = ".stack_buffer"]
