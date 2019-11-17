@@ -27,15 +27,6 @@ static mut PROCESSES: [Option<&'static dyn kernel::procs::ProcessType>; NUM_PROC
 #[link_section = ".stack_buffer"]
 pub static mut STACK_MEMORY: [u8; 0x1000] = [0; 0x1000];
 
-struct ArtyE21 { }
-
-impl Platform for ArtyE21 {
-    fn with_driver<F, R>(&self, _: usize, _: F) -> R
-    where
-        F: FnOnce(Option<&dyn kernel::Driver>) -> R,
-    { loop { } }
-}
-
 #[no_mangle]
 pub unsafe fn reset_handler() {
     kernel::procs::load_processes(None::<&'static arty_e21::chip::ArtyExx>.unwrap())
