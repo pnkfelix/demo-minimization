@@ -2579,7 +2579,7 @@ use crate::syscall::{self, Syscall, UserspaceKernelBoundary};
 use crate::tbfheader;
 use core::cmp::max;
 
-pub fn load_processes<C: Chip>(chip: &'static C) { unsafe { Process::create(chip); } }
+pub fn load_processes<C: Chip>(_: &'static C) { unsafe { process_create::<C>(); } }
 
 pub trait ProcessType {
     unsafe fn process_detail_fmt(&self, writer: &mut dyn Write) { loop { } }
@@ -2684,15 +2684,8 @@ impl<C: Chip> ProcessType for Process<'a, C> {
 
 fn exceeded_check(size: usize, allocated: usize) -> &'static str { loop { } }
 
-impl<C: 'static + Chip> Process<'a, C> {
-    #[allow(clippy::cast_ptr_alignment)]
-    crate unsafe fn create(
-        chip: &'static C,
-    ) -> &'static dyn ProcessType {
-            let mut process: &mut Process<C> = None.unwrap();
-
-            process
-    }
+fn process_create<C: 'static + Chip>() {
+    let _: &'static dyn ProcessType = None::<&mut Process<C>>.unwrap();
 }
 
 impl<C: 'static + Chip> Process<'a, C> {
