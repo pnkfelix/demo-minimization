@@ -38,11 +38,5 @@ impl Platform for ArtyE21 {
 
 #[no_mangle]
 pub unsafe fn reset_handler() {
-    let chip = static_init!(arty_e21::chip::ArtyExx, arty_e21::chip::ArtyExx::new());
-    let board_kernel = static_init!(kernel::Kernel, kernel::Kernel::new(&PROCESSES));
-
-    kernel::procs::load_processes(
-        chip,
-    );
-
+    kernel::procs::load_processes(None::<&'static arty_e21::chip::ArtyExx>.unwrap())
 }
